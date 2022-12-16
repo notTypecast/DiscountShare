@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS category;
 
 CREATE TABLE user (
     username VARCHAR(24) PRIMARY KEY NOT NULL,
+    email VARCHAR(255) NOT NULL,
     hash CHAR(60) BINARY NOT NULL
 );
 
