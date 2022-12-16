@@ -1,0 +1,35 @@
+-- SQLBook: Code
+-- Active: 1670774456977@@localhost@3306@DiscountShare
+USE DiscountShare;
+
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS subcategory;
+DROP TABLE IF EXISTS category;
+
+
+CREATE TABLE user (
+    username VARCHAR(24) PRIMARY KEY NOT NULL,
+    hash CHAR(60) BINARY NOT NULL
+);
+
+CREATE TABLE category (
+    id VARCHAR(255) PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE subcategory (
+    id VARCHAR(255) PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    category_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES category(id) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE product (
+    id INT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    category_id VARCHAR(255) NOT NULL,
+    subcategory_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES category(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (subcategory_id) REFERENCES subcategory(id) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
