@@ -2,9 +2,11 @@ const EXPECTED_DATA = {
     "register": {
         "headers": [],
         "body": ["username", "password_b64", "email"]
+    },
+    "login": {
+        "headers": [],
+        "body": ["username", "password_b64"]
     }
-
-
 
 }
 

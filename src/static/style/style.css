@@ -18,6 +18,12 @@ body {
     background-color: #EEF0F2;
     font-family: 'Roboto', sans-serif;
 }
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url("../fonts/MaterialIcons-Regular.ttf");
+}
 
 @font-face {
     font-family: "Poppins";
@@ -74,4 +80,149 @@ body {
     src: url('../fonts/Roboto-ThinItalic.ttf');
     font-weight: 100;
     font-style: italic;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+  
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+  
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+  }
+
+.loader {
+    display: inline-block;
+    width:120px;
+    height: 50px;
+    position: fixed;
+    padding:0;
+    margin:0;
+    left:60px;
+    bottom: 60px;
+    z-index: +99999;
+}
+
+.loader::before {
+    content: '';
+    position: absolute;
+    left:20px;
+    top:10px;
+    width:30px;
+    height:30px;
+    display: inline-block;
+    background-color:#0B0A07;
+    border-radius: 50%;
+    animation: leftloadermove .5s infinite;
+}
+
+.loader::after {
+    content: '';
+    position: absolute;
+    right:20px;
+    width:30px;
+    top:10px;
+    height:30px;
+    display: inline-block;
+    background-color:#39806E;
+    border-radius: 50%;
+    animation: rightloadermove .5s infinite;
+}
+
+@keyframes leftloadermove {
+    0% {
+        left:20px;
+    }
+    50% {
+        left: 70px;
+    }
+    100% {
+        left:20px;
+    }
+}
+@keyframes rightloadermove {
+    0% {
+        right:20px;
+    }
+    50% {
+        right: 70px;
+    }
+    100% {
+        right:20px;
+    }
+}
+
+.toast {
+    display: inline-block;
+    position: fixed;
+    width:25%;
+    left:37.5%;
+    bottom:50px;
+    line-height: 50px;
+    background-color:#056147;
+    color: white;
+    font-family: "Roboto";
+    font-weight: 400;
+    z-index: 999;
+    text-align: center;
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    animation: toastanimationappear .5s;
+    animation-fill-mode: forwards;
+}
+.toast-exit {
+    animation: toastanimationdisappear .5s;
+    animation-fill-mode: forwards;
+}
+
+.success-toast {
+    background-color:#056147;
+}
+.failure-toast {
+    background-color:#A44A3F;
+}
+
+.toast span {
+    line-height: 50px;
+    position: absolute;
+    left:0;
+    top:0;
+    width: 50px;
+    text-align: center;
+    color: #fff;
+}
+
+@keyframes toastanimationappear {
+    from {
+        bottom: 10px;
+        opacity: 0;
+    } to {
+        bottom: 50px;
+        opacity: 1;
+    }
+}
+
+@keyframes toastanimationdisappear {
+    from {
+        bottom: 50px;
+        opacity: 1;
+    } to {
+        bottom: 10px;
+        opacity: 0;
+    }
 }

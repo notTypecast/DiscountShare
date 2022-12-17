@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="apple-touch-icon" sizes="180x180" href="../static/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../static/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../static/img/favicon/site.webmanifest">
     <link href="../static/style/style.css" rel="stylesheet" type="text/css"/>
     <link href="../static/style/login_register.css" rel="stylesheet" type="text/css"/>
+    <script src="../static/js/lib.js" defer></script>
+    <script src="../static/js/register.js" defer></script>
     <title>DiscountShare</title>
   </head>
   <body>
@@ -14,11 +20,11 @@
             <div class="main-content-wrap">
               <h1 class="main-logo">Discount<span>Share</span></h1>
               <form class="login-form">
-                <input type="text" class="form-input" placeholder="Username" />
-                <input type="text" class="form-input" placeholder="E-mail Address" />
-                <input type="password" class="form-input" placeholder="Password" />
-                <input type="password" class="form-input" placeholder="Confirm Password" />
-                <button type="submit" class="form-submit">Sign up</button>
+                <input type="text" id="usernameInput" class="form-input" placeholder="Username" />
+                <input type="text" id="emailInput" class="form-input" placeholder="E-mail Address" />
+                <input type="password" id="passwordInput" class="form-input" placeholder="Password" />
+                <input type="password" id="confirmPasswordInput" class="form-input" placeholder="Confirm Password" />
+                <button type="submit" id="formSubmit" class="form-submit">Sign up</button>
                 <span class="form-prompt">Already have an account? <a href="/login">Sign in</a></span>
               </form>
             </div>
@@ -32,6 +38,5 @@
 
 
     </main>
-	<script src="index.js"></script>
   </body>
 </html>

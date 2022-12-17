@@ -141,6 +141,24 @@ main section {
     color: #39806E;
 }
 
+.warning {
+    color: #EE6055;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.warning-wrap {
+    margin-bottom: 10px;
+}
+
+.warning-input {
+    border: solid 1px #EE6055;
+}
+.warning-input:focus {
+    border: solid 1px #EE6055;
+}
+
 @media (max-width: 768px) {
     .main-content-wrap {
         min-width: 300px;
