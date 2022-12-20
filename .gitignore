@@ -164,3 +164,7 @@ dist
 
 
 test.rest
+sample_store_data.json
+test2.py
+testjson.py
+testfile.py
