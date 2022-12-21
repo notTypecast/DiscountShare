@@ -104,16 +104,25 @@ function removeWarnings(inputNode) {
     }
 }
 
-async function submitForm(endpoint, body) {
-    showLoader();
-    const response = await fetch(endpoint, {
+async function sameOriginPostRequest(endpoint, body) {
+    const response = await fetch(rootURL + endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(body),
-        redirect: "follow"
+        redirect: "manual"
     });
-    hideLoader();
     return response;
+}
+
+function deleteAllCookies() {
+    let cookies = document.cookie.split(";");
+
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i];
+        let eqPos = cookie.indexOf("=");
+        let name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
 }

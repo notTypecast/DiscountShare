@@ -1,5 +1,4 @@
 import { createJWT } from "../util/token.js";
-import { matchSchema } from "../schema/requests.js";
 import { insertUser } from "../models/userModel.js";
 import { hashPassword } from "../util/pass.js";
 
@@ -9,12 +8,6 @@ const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]
 
 
 async function registerController(req, res) {
-    // compare request header/body to schema to check for expected arguments
-    if (!matchSchema(req, "register")) {
-        console.log("Schema did not match.");
-        return res.status(400).json({error: "Request did not match schema."});
-    }
- 
     // validate username and password
     if (req.body.username.length > 24 || req.body.username.length < 2) {
         return res.status(400).json({error: "Invalid username length."});
@@ -57,7 +50,7 @@ async function registerController(req, res) {
     // set jwt token cookie for new user
     if (errval === null) {
         let token = createJWT(req.body.username);
-        return res.status(200).json({session_token: token});    
+        return res.status(200).json({session_token: token});  
     }
 
     return res.status(409).json({error: "Username unavailable."});

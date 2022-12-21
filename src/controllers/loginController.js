@@ -1,14 +1,8 @@
 import { createJWT } from "../util/token.js";
-import { matchSchema } from "../schema/requests.js";
 import { getUser } from "../models/userModel.js";
 import { validatePassword } from "../util/pass.js";
 
 async function loginController(req, res) {
-    if (!matchSchema(req, "login")) {
-        console.log("Schema did not match.");
-        return res.status(400).json({error: "Request did not match schema."});
-    }
-
     let results;
     try {
         results = await getUser(req.body.username);

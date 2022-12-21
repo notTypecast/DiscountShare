@@ -33,19 +33,22 @@ usernameInput.addEventListener("keyup", () => {
 submitButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const response = await submitForm(rootURL + loginEndpoint, {
+    showLoader();
+    const response = await sameOriginPostRequest(loginEndpoint, {
         "username": usernameInput.value,
         "password_b64": window.btoa(passwordInput.value)
     });
 
     let body = await response.json();
 
+    hideLoader();
     if (response.status == 403) {
         makeToast("failure", "Invalid credentials!", 3000);
     } else if (response.status >= 200 && response.status < 300) {
         console.log(response);
         makeToast("success", "Successfully logged in!", 3000);
         document.cookie = "session_token=" + body.session_token+"; SameSite=Lax";
+        window.location.href="/";
     } else {
         makeToast("failure", "Failed to log in!", 3000);
     }

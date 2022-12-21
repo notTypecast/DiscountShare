@@ -96,13 +96,15 @@ confirmPasswordInput.addEventListener("keyup", confirmPasswordEventListener);
 submitButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const response = await submitForm(rootURL + registerEndpoint, {
+    showLoader();
+    const response = await sameOriginPostRequest(registerEndpoint, {
         "username": usernameInput.value,
         "password_b64": window.btoa(passwordInput.value),
         "email": emailInput.value
     });
 
     const body = await response.json();
+    hideLoader();
 
     if (response.status >= 400) {
         makeToast("failure", "Failed to register!", 3000);
@@ -110,5 +112,6 @@ submitButton.addEventListener("click", async (e) => {
     else if (response.status >= 200 && response.status < 300) {
         makeToast("success", "Successfully registered user!", 3000);
         document.cookie = "session_token=" + body.session_token+"; SameSite=Lax";
+        window.location.href="/";
     }
 });

@@ -1,10 +1,8 @@
 import express from "express";
-import { requireAuth } from "../middleware/requireAuth.js";
 import { registerController } from "../controllers/registerController.js";
+import { generateMatchSchema } from "../middleware/schema.js";
 const router = express.Router();
 
-
-
-router.post("/register", registerController);
+router.post("/register", generateMatchSchema("register"), registerController);
 
 export {router as registerRouter};

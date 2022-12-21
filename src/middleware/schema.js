@@ -6,6 +6,10 @@ const EXPECTED_DATA = {
     "login": {
         "headers": [],
         "body": ["username", "password_b64"]
+    },
+    "shops": {
+        "headers": [],
+        "body": ["latitude", "longitude"]
     }
 
 }
@@ -31,4 +35,13 @@ function matchSchema(obj, endpoint) {
     return true;
 }
 
-export {matchSchema};
+function generateMatchSchema(schemaName) {
+    return (req, res, next) => {
+        if (!matchSchema(req, schemaName)) {
+            return res.status(400).json({error: "Request did not match schema."});
+        }
+        next();
+    }
+}
+
+export {generateMatchSchema};

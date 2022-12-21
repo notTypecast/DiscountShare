@@ -5,8 +5,7 @@ dotenv.config();
 
 const secret = process.env.JWT_SECRET;
 
-
-function requireAuth(req, res, next) {
+function loggedIn(req, res, next) {
     let token = req.cookies.session_token;
     try {
         if (token === undefined) {
@@ -14,11 +13,11 @@ function requireAuth(req, res, next) {
         }
         let decoded = jwt.verify(token, secret);
         res.locals.user_data = decoded;
+        return res.status(200).redirect("/");
     } catch (err) {
         res.clearCookie("session_token")
-        return res.status(403).redirect("/login");
     }
     next();
 }
 
-export {requireAuth};
+export {loggedIn};

@@ -1,5 +1,5 @@
 -- SQLBook: Code
--- Active: 1670774456977@@localhost@3306@DiscountShare
+-- Active: 1671284697971@@127.0.0.1@3306@DiscountShare
 USE DiscountShare;
 
 DROP TABLE IF EXISTS price;
@@ -65,16 +65,17 @@ CREATE TABLE price (
     price FLOAT NOT NULL,
     PRIMARY KEY (product_name, day_date),
     FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE    
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE discount (
-    discount_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     shop_id VARCHAR(255) NOT NULL,
     product_name VARCHAR(255) NOT NULL,
     username VARCHAR(24) NOT NULL,
     likes INT NOT NULL DEFAULT 0,
     dislikes INT NOT NULL DEFAULT 0,
-    expiry TIMESTAMP NOT NULL,
+    posted DATETIME NOT NULL,
+    expiry DATETIME NOT NULL,
     FOREIGN KEY (shop_id) REFERENCES shop(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE
