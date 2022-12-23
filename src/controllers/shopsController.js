@@ -2,15 +2,14 @@ import { getShops } from "../models/shopModel.js";
 import { distanceBetween } from "../util/distance.js";
 
 async function shopsController(req, res) {
-    let user_lat = req.body.latitude;
-    let user_long = req.body.longitude;
+    let user_lat = req.query.latitude;
+    let user_long = req.query.longitude;
 
     let results;
     
     try {
-        results = await getShops();
+        results = await getShops(req.query.category_id);
     } catch (err) {
-        console.log(err);
         return res.status(500).json({error: "Internal server error."});
     }
 
@@ -23,7 +22,7 @@ async function shopsController(req, res) {
         }
     }
 
-    return res.status(200).json(results);s
+    return res.status(200).json(results);
 }
 
 

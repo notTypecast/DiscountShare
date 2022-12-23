@@ -105,15 +105,46 @@ function removeWarnings(inputNode) {
 }
 
 async function sameOriginPostRequest(endpoint, body) {
-    const response = await fetch(rootURL + endpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body),
-        redirect: "manual"
-    });
-    return response;
+    try {
+        const response = await fetch(rootURL + endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body),
+            redirect: "manual"
+        });
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err;
+    }
+}
+
+async function sameOriginGetRequest(endpoint, params) {
+    try {
+        const keys = Object.keys(params);
+        let queryString = "?";
+        let total_keys = 0;
+        if (keys.length !== 0) {
+            for (let param of keys) {
+                if (params[param] !== undefined) {
+                    ++total_keys;
+                    queryString += `${param}=${params[param]}&`;
+                }
+            }
+            if (total_keys !== 0) {
+                queryString = queryString.substring(0, queryString.length - 1);
+            }
+        }
+
+        const response = await fetch(rootURL + endpoint + (total_keys === 0 ? "" : queryString));
+
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err;
+    }
 }
 
 function deleteAllCookies() {

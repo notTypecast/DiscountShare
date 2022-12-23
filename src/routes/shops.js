@@ -4,7 +4,6 @@ import { shopsController } from "../controllers/shopsController.js";
 import { generateMatchSchema } from "../middleware/schema.js";
 const router = express.Router();
 
-// TODO: add requireAuth middleware
-router.post("/shops", generateMatchSchema("shops"), shopsController);
+router.get("/shops", requireAuth, generateMatchSchema("shops", "get"), shopsController);
 
 export {router as shopsRouter};

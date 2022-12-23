@@ -7,6 +7,8 @@ import { requireAuth } from "./middleware/requireAuth.js";
 import { loggedIn } from "./middleware/loggedIn.js";
 import {getShops} from "./models/shopModel.js";
 import { updatePOIsFromFile } from "./models/poiModel.js";
+import { updateProductsFromFile } from "./models/productModel.js";
+import { updatePricesFromFile } from "./models/priceModel.js";
 
 dotenv.config();
 const app = express();
@@ -17,15 +19,17 @@ global.pool = mysql.createPool({
     database: "DiscountShare"
 });
 
-
+// TODO REMOVE THIS
 (async function() {
+    await updateProductsFromFile("data/products.json");
+    await updatePricesFromFile("data/price_history.json");
     await updatePOIsFromFile("data/POIs.json");
-    await getShops();
 })();
 
 import {registerRouter} from "./routes/register.js";
 import { loginRouter } from "./routes/login.js";
 import { shopsRouter } from "./routes/shops.js";
+import { categoriesRouter } from "./routes/categories.js"
 
 app.use(cors());
 app.use(cookieParser());
@@ -33,6 +37,7 @@ app.use(express.json());
 app.use("/api/", registerRouter);
 app.use("/api/", loginRouter);
 app.use("/api/", shopsRouter);
+app.use("/api/", categoriesRouter);
 
 app.get("/", requireAuth);
 app.get("/login", loggedIn);

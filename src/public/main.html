@@ -14,6 +14,8 @@
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
      integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
      crossorigin=""></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/3.0.5/leaflet-search.min.js" integrity="sha512-nvy2tht2GE/ReEeu0Zu7/Y1IgKTTrX1r1MaROtD1HDol5WUvw7Ih29qA6JCNCgYURzPcBqaSv12ZnNS68Eaq6Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/3.0.5/leaflet-search.min.css" integrity="sha512-+o26nsM883F01UlBWY09KgjDn7o1rgGFi1a+lX1zI7m0I2iIh4rckpQSKVnukvn8DKsb0A9hZHoUY7lBkvLdfA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="/static/style/style.css" rel="stylesheet" type="text/css"/>
     <link href="/static/style/main.css" rel="stylesheet" type="text/css"/>
     <script src="/static/js/lib.js" defer></script>
@@ -32,6 +34,15 @@
     </nav>
     <main>
       <div id="map"></div>
+      <div class="filters-wrap" id="filtersWrap">
+        <div class="filters-header" id="filtersHeader">
+          <h2><span class="material-icons">tune</span>Category filter</h2>
+          <span class="material-icons expand-icon">expand_less</span>
+      </div>
+      <div class="filters-body">
+        <ul id="filterList">
+        </ul>
+      </div>
     </main>
   </body>
 </html>

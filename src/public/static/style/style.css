@@ -226,3 +226,39 @@ body {
         opacity: 0;
     }
 }
+
+input[type="radio"] {
+    display: none;
+}
+  
+input[type="radio"] + label {
+    display: inline-block;
+    padding: 4px 8px;
+    font-family: "Roboto", sans-serif;
+    font-size: 1.2rem;
+    color: rgb(80, 80, 80);
+    cursor: pointer;
+    user-select: none;
+}
+
+input[type="radio"] + label:before {
+    content: '';
+    position: relative;
+    width:10px;
+    height: 10px;
+    border-radius: 50px;
+    border: solid 1px rgb(206, 206, 206);
+    display: inline-block;
+    vertical-align: middle;
+    translate: 0px -1px;
+    margin-right: 8px;
+}
+
+.checkedLabel {
+    color: #000;
+}
+
+.checkedLabel:before {
+    background-color: #056147;
+    border: solid 1px transparent;
+}
