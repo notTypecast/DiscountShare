@@ -5,7 +5,7 @@ async function updatePricesFromFile(filepath) {
     let data = await fs.readFile(filepath);
     const jsonData = JSON.parse(data);
 
-    const prices_sql = "INSERT INTO price(product_name, day_date, price) VALUES ? ON DUPLICATE KEY UPDATE day_date = VALUES(day_date), price = VALUES(price)";
+    const prices_sql = "INSERT INTO price(product_name, day_date, cost) VALUES ? ON DUPLICATE KEY UPDATE day_date = VALUES(day_date), cost = VALUES(cost)";
     const price_data = [];
 
     for (let product of jsonData.data) {

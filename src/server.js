@@ -30,6 +30,7 @@ import {registerRouter} from "./routes/register.js";
 import { loginRouter } from "./routes/login.js";
 import { shopsRouter } from "./routes/shops.js";
 import { categoriesRouter } from "./routes/categories.js"
+import { discountsRouter } from "./routes/discounts.js";
 
 app.use(cors());
 app.use(cookieParser());
@@ -38,6 +39,7 @@ app.use("/api/", registerRouter);
 app.use("/api/", loginRouter);
 app.use("/api/", shopsRouter);
 app.use("/api/", categoriesRouter);
+app.use("/api/", discountsRouter);
 
 app.get("/", requireAuth);
 app.get("/login", loggedIn);

@@ -1,5 +1,6 @@
 const shopsEndpoint = "/api/shops";
 const categoriesEndpoint = "/api/categories";
+const discountsEndpoint = "/api/discounts";
 const logoutBtn = document.getElementById("logoutBtn");
 const filterHeader = document.getElementById("filtersHeader");
 let selectedFilter = null;
@@ -127,13 +128,14 @@ async function loadShops(category_id) {
             title: title,
             icon: row.discountCount > 0 ? greenIcon : greyIcon
         });
-        // TODO add html and css for popups
         let popup = L.popup().setContent(createPopup({
+            id: row.id,
             title: title,
             type: row.shop_type, // cannot be undefined
             brand: row.brand,
             website: row.website,
-            phone_number: row.phone_number
+            phone_number: row.phone_number,
+            discountCount: row.discountCount
         }));
         marker.bindPopup(popup);
         marker.addTo(markersGroup);
@@ -157,9 +159,12 @@ function createPopup(properties) {
     titleNode.innerText = properties.title;
     popup.appendChild(titleNode);
 
+    let discountCount = properties.discountCount;
+    let shop_id = properties.id;
     // "remove" name and id from properties since they are already dislayed as title
     properties.name = null;
     properties.id = null;
+    properties.discountCount = null;
 
     for (let property in properties) {
         if (properties[property] !== null) {
@@ -174,8 +179,33 @@ function createPopup(properties) {
     let showDiscountsBtn = document.createElement("button");
     showDiscountsBtn.classList.add("popup-btn");
     showDiscountsBtn.innerText = "Show discounts";
-    showDiscountsBtn.addEventListener("click", (e) => {
-        alert("show");
+    showDiscountsBtn.addEventListener("click", async (e) => {
+        let popupHeader = document.createElement("h2");
+        popupHeader.innerHTML = "Showing discounts for <span>" + properties.title + "</span>";
+
+        let popupBody;
+        if (discountCount > 0) {
+            // TODO: make likes/dislikes clickable when appropriate
+            // TODO: maybe change shop name color?
+            showLoader();
+            let response = await sameOriginGetRequest(discountsEndpoint, {
+                "shop_id": shop_id
+            });
+            response = await response.json();
+            let discountsWrap = document.createElement("div");
+            discountsWrap.classList.add("discounts-wrap");
+            for (let discount of response) {
+                discountsWrap.appendChild(createDiscountCard(discount));
+            }
+            console.log(response);
+            popupBody = discountsWrap;
+            hideLoader();
+        } else {
+            popupBody = document.createElement("p");
+            popupBody.classList.add("no-discounts");
+            popupBody.innerText = "No discounts available.";
+        }
+        createPagePopup(document.body, popupHeader, popupBody);
     });
     popup.appendChild(showDiscountsBtn);
 
@@ -245,4 +275,142 @@ async function createFiltersList() {
             loadShops(id);
         });
     }
+}
+
+
+function createDiscountCard(properties) {
+    let card = document.createElement("div");
+    card.classList.add("discount");
+
+    let cardTopBar = document.createElement("div");
+    cardTopBar.classList.add("discount-top-bar");
+    let iconwrap = document.createElement("div");
+    let icon;
+    switch (properties.condition_value) {
+        case 2:
+            icon = document.createElement("span");
+            icon.classList.add("discount-day-deal");
+            icon.classList.add("material-icons");
+            icon.setAttribute("title", "This price is at least 20% off the average price of the product in the last day.");
+            icon.innerText = "local_fire_department";
+            iconwrap.appendChild(icon);
+            break;
+        case 1:
+            icon = document.createElement("span");
+            icon.classList.add("discount-week-deal");
+            icon.classList.add("material-icons");
+            icon.setAttribute("title", "This price is at least 20% off the average price of the product in the last week.");
+            icon.innerText = "price_change";
+            iconwrap.appendChild(icon);
+            break;
+    }
+    cardTopBar.appendChild(iconwrap);
+    let stockStatus = document.createElement("p");
+    stockStatus.classList.add("discount-stock-status");
+    if (properties.in_stock) {
+        stockStatus.innerText = "In stock";
+    } else {
+        stockStatus.innerText = "Out of stock";
+    }
+    cardTopBar.appendChild(stockStatus);
+    card.append(cardTopBar);
+
+    let cardBanner = document.createElement("img");
+    cardBanner.classList.add("discount-banner");
+    cardBanner.src = properties.image_link;
+    card.appendChild(cardBanner);
+
+    let cardTitle = document.createElement("h4");
+    cardTitle.classList.add("discount-title");
+    cardTitle.innerText = properties.product_name;
+    card.appendChild(cardTitle);
+
+    let cardDate = document.createElement("p");
+    cardDate.classList.add("discount-date");
+    let dateIcon = document.createElement("span");
+    dateIcon.classList.add("material-icons");
+    dateIcon.innerText = "calendar_today";
+    cardDate.appendChild(dateIcon);
+
+    let date = new Date(properties.posted);
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let fPostedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+    cardDate.appendChild(document.createTextNode(fPostedDate));
+    card.appendChild(cardDate);
+
+    let cardExpires = document.createElement("p");
+    cardExpires.classList.add("discount-date");
+    let expiresIcon = document.createElement("span");
+    expiresIcon.classList.add("material-icons");
+    expiresIcon.innerText = "timer";
+    cardExpires.appendChild(expiresIcon);
+
+    date = new Date(properties.expiry);
+    year = date.getFullYear();
+    month = date.getMonth() + 1;
+    day = date.getDate();
+    hours = date.getHours();
+    minutes = date.getMinutes();
+    fExpiryDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    cardExpires.appendChild(document.createTextNode(fExpiryDate));
+    card.appendChild(cardExpires);
+
+    let cardUser = document.createElement("p");
+    cardUser.classList.add("discount-user");
+    let userIcon = document.createElement("span");
+    userIcon.classList.add("material-icons");
+    userIcon.innerText = "person";
+    cardUser.appendChild(userIcon);
+    cardUser.appendChild(document.createTextNode(properties.username + ", " 
+        + properties.total_review_score));
+    card.appendChild(cardUser);
+
+    let cardBottomBar = document.createElement("div");
+    cardBottomBar.classList.add("discount-bottom-bar");
+    let cardPrice = document.createElement("p");
+    cardPrice.classList.add("discount-price");
+    cardPrice.innerText = properties.cost + "€";
+    cardBottomBar.appendChild(cardPrice);
+
+    let reviewWrap = document.createElement("div");
+    reviewWrap.classList.add("discount-review-wrap");
+    let likes  = document.createElement("p");
+    likes.setAttribute("title", "Like this discount");
+    likes.classList.add("discount-like");
+    likes.classList.add("discount-review-btn");
+    let likeIcon = document.createElement("span");
+    likeIcon.classList.add("material-icons");
+    likeIcon.innerText = "thumb_up";
+    likes.appendChild(likeIcon);
+    likes.appendChild(document.createTextNode(properties.likes));
+    reviewWrap.appendChild(likes);
+    let dislikes = document.createElement("p");
+    dislikes.setAttribute("title", "Dislike this discount");
+    dislikes.classList.add("discount-dislike");
+    dislikes.classList.add("discount-review-btn");
+    let dislikeIcon = document.createElement("span");
+    dislikeIcon.classList.add("material-icons");
+    dislikeIcon.innerText = "thumb_down";
+    dislikes.appendChild(dislikeIcon);
+    dislikes.appendChild(document.createTextNode(properties.dislikes));
+    reviewWrap.appendChild(dislikes);
+    let markOos = document.createElement("p");
+    markOos.classList.add("discount-mark-oos");
+    markOos.classList.add("discount-review-btn");
+    markOos.setAttribute("title", "Mark this product as out of stock");
+    let markOosIcon = document.createElement("span");
+    markOosIcon.classList.add("material-icons");
+    markOosIcon.innerText = "production_quantity_limits";
+    markOos.appendChild(markOosIcon);
+    reviewWrap.appendChild(markOos);
+
+    cardBottomBar.appendChild(reviewWrap);
+    card.appendChild(cardBottomBar);
+
+    return card;
 }

@@ -121,6 +121,22 @@ async function sameOriginPostRequest(endpoint, body) {
     }
 }
 
+async function sameOriginPatchRequest(endpoint, body) {
+    try {
+        const response = await fetch(rootURL + endpoint, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        });
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err;
+    } 
+}
+
 async function sameOriginGetRequest(endpoint, params) {
     try {
         const keys = Object.keys(params);
@@ -157,3 +173,38 @@ function deleteAllCookies() {
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
 }
+
+function createPagePopup(mountNode, headerNode, bodyNode, onLoad) {
+    let popup = document.createElement("div");
+    popup.classList.add("page-popup");
+    let popupHeader = document.createElement("div");
+    popupHeader.classList.add("page-popup-header");
+    popup.append(popupHeader);
+    let closeBtn = document.createElement("span");
+    closeBtn.classList.add("material-icons");
+    closeBtn.classList.add("page-popup-close");
+    closeBtn.innerHTML = "close";
+    closeBtn.addEventListener("click", () => {
+        popup.remove();
+    });  
+    popup.append(closeBtn);
+
+    if (headerNode !== undefined) {
+        headerNode.classList.add("page-popup-title");
+        popupHeader.appendChild(headerNode);
+    }
+
+    let popupBody = document.createElement("div");
+    popupBody.classList.add("page-popup-body");
+    popup.append(popupBody);
+    if (bodyNode !== undefined) {
+        popupBody.append(bodyNode);
+    }
+
+    if (onLoad !== undefined) {
+        onLoad();
+    }
+
+    mountNode.appendChild(popup);
+}
+

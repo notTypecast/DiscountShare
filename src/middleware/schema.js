@@ -11,12 +11,37 @@ const EXPECTED_DATA_POST = {
 
 const EXPECTED_DATA_GET = {
     "shops": ["latitude", "longitude"],
-    "categories": []
+    "categories": [],
+    "discounts": ["shop_id"]
+};
+
+const EXPECTED_DATA_PATCH = {
+    "discounts": {
+        "headers": [],
+        "body": ["in_stock", "shop_id", "product_name"]
+    }
+};
+
+const REQ_MATCH = {
+    "post": EXPECTED_DATA_POST,
+    "patch": EXPECTED_DATA_PATCH
 };
 
 function matchSchema(obj, req_type, endpoint) {
-    if (req_type === "post") {
-        const endpoint_data = EXPECTED_DATA_POST[endpoint];
+    if (req_type === "get") {
+        const endpoint_data = EXPECTED_DATA_GET[endpoint];
+        if (endpoint_data === undefined) {
+            return false;
+        }
+
+        for (let parameter of endpoint_data) {
+            if (obj.query[parameter] === undefined) {
+                return false;
+            }
+        }
+    }
+    else {
+        const endpoint_data = REQ_MATCH[req_type][endpoint];
         if (endpoint_data === undefined) {
             return false;
         }
@@ -29,18 +54,6 @@ function matchSchema(obj, req_type, endpoint) {
 
         for (let key of endpoint_data.body) {
             if (obj.body[key] === undefined) {
-                return false;
-            }
-        }
-    }
-    else if (req_type === "get") {
-        const endpoint_data = EXPECTED_DATA_GET[endpoint];
-        if (endpoint_data === undefined) {
-            return false;
-        }
-
-        for (let parameter of endpoint_data) {
-            if (obj.query[parameter] === undefined) {
                 return false;
             }
         }

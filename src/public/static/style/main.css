@@ -107,7 +107,6 @@ nav {
     cursor: pointer;
     border: solid 1px #39806E;
     border-radius: 3px;
-    transition: all .15s;
 }
 
 .popup-btn:hover {
@@ -185,4 +184,147 @@ nav {
 
 .filters-active {
     bottom:0;
+}
+
+.discounts-wrap {
+    position: relative;
+    width: 80%;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.discount {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding: 10px 25px;
+    max-width: 300px;
+    margin: 20px 20px;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+    border-top: solid 3px #39806E;
+    font-family: "Roboto", sans-serif;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.discount-top-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.discount-top-bar .material-icons {
+    translate: 0px 3px;
+}
+
+.discount-stock-status {
+    color: rgb(49, 49, 49);
+    font-weight: 300;
+}
+
+.discount-title {
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: 7px;
+}
+
+.discount-banner {
+    margin-bottom: 10px;
+}
+
+.discount-date, .discount-user {
+    color:rgb(70, 70, 70);
+    font-weight: 300;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.discount-user .material-icons {
+    margin-right: 3px;
+    color:rgb(90, 90, 90);
+    font-size: 1rem;
+}
+.discount-date .material-icons {
+    margin-right: 3px;
+    color:rgb(90, 90, 90);
+    font-size: 1rem;
+}
+
+.discount-bottom-bar {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.discount-review-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 10px;
+    margin-bottom: 15px;
+    margin-top:10px;
+    padding-top:20px;
+    border-top: solid 1px rgb(224, 224, 224);
+    width: 100%;
+    justify-content: center;
+}
+
+.discount-review-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0px 8px;
+    color:rgb(110, 110, 110);
+}
+
+.discount-review-btn .material-icons {
+    margin-right: 4px;
+    font-size: 1.2rem;
+}
+
+.discount-price {
+    font-size: 2rem;
+    font-weight: 400;
+    color:#39806E;
+}
+
+.discount-like {
+    color: #056147;
+}
+
+.discount-dislike {
+    color: #A44A3F;
+}
+
+.discount-mark-oos {
+    color: #0f3650;
+}
+
+.discount-week-deal {
+    color:rgb(255, 145, 0);
+}
+
+.discount-day-deal {
+    color: red;
+}
+
+.no-discounts {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 300;
+    margin-top: 15vh;
+    color: rgb(110, 110, 110);
 }

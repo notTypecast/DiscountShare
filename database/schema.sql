@@ -2,6 +2,7 @@
 -- Active: 1671284697971@@127.0.0.1@3306@DiscountShare
 USE DiscountShare;
 
+DROP TABLE IF EXISTS review;
 DROP TABLE IF EXISTS price;
 DROP TABLE IF EXISTS discount;
 DROP TABLE IF EXISTS user;
@@ -62,21 +63,32 @@ CREATE TABLE product (
 CREATE TABLE price (
     product_name VARCHAR(255) NOT NULL,
     day_date DATE NOT NULL,
-    price FLOAT NOT NULL,
+    cost FLOAT NOT NULL,
     PRIMARY KEY (product_name, day_date),
     FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE    
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE discount (
-    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     shop_id VARCHAR(255) NOT NULL,
     product_name VARCHAR(255) NOT NULL,
+    cost FLOAT NOT NULL,
     username VARCHAR(24) NOT NULL,
-    likes INT NOT NULL DEFAULT 0,
-    dislikes INT NOT NULL DEFAULT 0,
     posted DATETIME NOT NULL,
     expiry DATETIME NOT NULL,
+    in_stock TINYINT(1) NOT NULL DEFAULT 1,
+    PRIMARY KEY (shop_id, product_name),
     FOREIGN KEY (shop_id) REFERENCES shop(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE review (
+    username VARCHAR(24) NOT NULL,
+    shop_id VARCHAR(255) NOT NULL,
+    product_name VARCHAR(255) NOT NULL,
+    rating ENUM("like", "dislike") NOT NULL,
+    PRIMARY KEY (username, shop_id, product_name),
+    FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (shop_id) REFERENCES shop(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

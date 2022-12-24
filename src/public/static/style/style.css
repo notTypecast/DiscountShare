@@ -262,3 +262,58 @@ input[type="radio"] + label:before {
     background-color: #056147;
     border: solid 1px transparent;
 }
+
+.page-popup {
+    z-index: +99999;
+    position: fixed;
+    overflow-y: auto;
+    background-color: rgb(238, 240, 242);
+    width: 100%;
+    height: calc(100vh - (4rem + 1px));
+    left:0;
+    top:calc(4rem + 1px);
+    animation: page-popup-animation .25s;
+    animation-direction: forwards;
+}
+
+@keyframes page-popup-animation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+    
+.page-popup-close {
+    position: absolute;
+    left: 0;
+    top:0;
+    color: rgb(114, 114, 114);
+    font-size: 2.2rem;
+    text-align: center;
+    width: 70px;
+    line-height: 70px;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.page-popup-close:hover {
+    color: #000;
+}
+
+.page-popup-header {
+    position: relative;
+    width: 80%;
+    line-height: 70px;
+    margin: 0 auto;
+    padding-left: 10px;
+    text-align: center;
+    padding-right: 10px;
+}
+
+.page-popup-header h2 {
+    font-size: 1.8rem;
+    font-weight: 300;
+    font-family: "Roboto", sans-serif;
+}
