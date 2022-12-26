@@ -1,14 +1,16 @@
 import { promiseQuery } from "../util/query.js";
 
-async function getDiscounts(shop_id) {
+async function getDiscounts(shop_id, username) {
     let results = await promiseQuery(`SELECT discount.product_name, discount.username, discount.cost, (CASE WHEN price.cost IS NULL THEN 2
         WHEN discount.cost < 0.8*price.cost THEN 2
         WHEN discount.cost < 0.8*avg_price.avg_cost THEN 1
         ELSE 0 END) AS condition_value,
-    COUNT(CASE WHEN rating='like' THEN 1 ELSE NULL END) AS likes, COUNT(CASE WHEN rating='dislike' THEN 1 ELSE NULL END) AS dislikes,
+    COUNT(CASE WHEN review.rating='like' THEN 1 ELSE NULL END) AS likes, COUNT(CASE WHEN review.rating='dislike' THEN 1 ELSE NULL END) AS dislikes,
+    r_usr.rating AS current_rating,
     posted, expiry, in_stock, image_link, total_review_score
     FROM discount 
     LEFT JOIN review ON discount.shop_id=review.shop_id AND discount.product_name=review.product_name
+    LEFT JOIN review AS r_usr ON r_usr.username=?
     LEFT JOIN (
         SELECT price.product_name, price.cost
         FROM price INNER JOIN (
@@ -26,7 +28,7 @@ async function getDiscounts(shop_id) {
     INNER JOIN product ON discount.product_name=product.name
     INNER JOIN user ON discount.username=user.username
     WHERE discount.shop_id=?
-    GROUP BY discount.product_name, discount.username, discount.cost, condition_value, posted, expiry, in_stock, image_link, total_review_score`, shop_id);
+    GROUP BY discount.product_name, discount.username, discount.cost, condition_value, current_rating, posted, expiry, in_stock, image_link, total_review_score`, [username, shop_id]);
 
     return results;
 }
@@ -37,4 +39,16 @@ async function setInStock(shop_id, product_name, value) {
     return null;
 }
 
-export { getDiscounts, setInStock };
+async function setRating(username, shop_id, product_name, rating) {
+    let result = await promiseQuery("INSERT INTO review(username, shop_id, product_name, rating) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating=?", [username, shop_id, product_name, rating, rating]);
+
+    return null;
+}
+
+async function removeRating(username, shop_id, product_name) {
+    let result = await promiseQuery("DELETE FROM review WHERE username=? AND shop_id=? AND product_name=?", [username, shop_id, product_name]);
+
+    return null;
+}
+
+export { getDiscounts, setInStock, setRating, removeRating };

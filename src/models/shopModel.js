@@ -12,4 +12,9 @@ async function getShops(category_id) {
     return results;
 }
 
-export {getShops};
+async function getShopLocation(shop_id) {
+    let result = await promiseQuery("SELECT latitude, longitude FROM shop WHERE id=?", shop_id);
+    return result;
+}
+
+export {getShops, getShopLocation};

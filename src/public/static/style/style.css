@@ -178,7 +178,7 @@ body {
     color: white;
     font-family: "Roboto";
     font-weight: 400;
-    z-index: 999;
+    z-index: 999999;
     text-align: center;
     border-radius: 3px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;

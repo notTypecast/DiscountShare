@@ -135,7 +135,8 @@ async function loadShops(category_id) {
             brand: row.brand,
             website: row.website,
             phone_number: row.phone_number,
-            discountCount: row.discountCount
+            discountCount: row.discountCount,
+            allowOffers: row.allowOffers
         }));
         marker.bindPopup(popup);
         marker.addTo(markersGroup);
@@ -161,16 +162,19 @@ function createPopup(properties) {
 
     let discountCount = properties.discountCount;
     let shop_id = properties.id;
+    let allowOffers = properties.allowOffers;
     // "remove" name and id from properties since they are already dislayed as title
     properties.name = null;
     properties.id = null;
     properties.discountCount = null;
+    properties.allowOffers = null;
 
     for (let property in properties) {
         if (properties[property] !== null) {
             let node = document.createElement("p");
             node.classList.add("popup-property");
-            node.innerHTML = property.charAt(0).toUpperCase() + property.slice(1) + ": <span>" 
+            let propertyName = property.replace("_", " ");
+            node.innerHTML = propertyName.charAt(0).toUpperCase() + propertyName.slice(1) + ": <span>" 
                 +properties[property].charAt(0).toUpperCase() + properties[property].slice(1)+ "</span>";
             popup.appendChild(node);
         }
@@ -194,10 +198,9 @@ function createPopup(properties) {
             response = await response.json();
             let discountsWrap = document.createElement("div");
             discountsWrap.classList.add("discounts-wrap");
-            for (let discount of response) {
-                discountsWrap.appendChild(createDiscountCard(discount));
+            for (let i =0; i < response.length; i++) {
+                discountsWrap.appendChild(createDiscountCard(response[i], allowOffers, shop_id, i));
             }
-            console.log(response);
             popupBody = discountsWrap;
             hideLoader();
         } else {
@@ -278,9 +281,10 @@ async function createFiltersList() {
 }
 
 
-function createDiscountCard(properties) {
+function createDiscountCard(properties, allowOffers, shop_id, index) {
     let card = document.createElement("div");
     card.classList.add("discount");
+    card.id = "discount-" + index;
 
     let cardTopBar = document.createElement("div");
     cardTopBar.classList.add("discount-top-bar");
@@ -381,8 +385,10 @@ function createDiscountCard(properties) {
     reviewWrap.classList.add("discount-review-wrap");
     let likes  = document.createElement("p");
     likes.setAttribute("title", "Like this discount");
-    likes.classList.add("discount-like");
     likes.classList.add("discount-review-btn");
+    if (properties.current_rating === "like") {
+        likes.classList.add("discount-like-active");
+    }
     let likeIcon = document.createElement("span");
     likeIcon.classList.add("material-icons");
     likeIcon.innerText = "thumb_up";
@@ -391,8 +397,10 @@ function createDiscountCard(properties) {
     reviewWrap.appendChild(likes);
     let dislikes = document.createElement("p");
     dislikes.setAttribute("title", "Dislike this discount");
-    dislikes.classList.add("discount-dislike");
     dislikes.classList.add("discount-review-btn");
+    if (properties.current_rating === "dislike") {
+        dislikes.classList.add("discount-dislike-active");
+    }
     let dislikeIcon = document.createElement("span");
     dislikeIcon.classList.add("material-icons");
     dislikeIcon.innerText = "thumb_down";
@@ -400,7 +408,6 @@ function createDiscountCard(properties) {
     dislikes.appendChild(document.createTextNode(properties.dislikes));
     reviewWrap.appendChild(dislikes);
     let markOos = document.createElement("p");
-    markOos.classList.add("discount-mark-oos");
     markOos.classList.add("discount-review-btn");
     markOos.setAttribute("title", "Mark this product as out of stock");
     let markOosIcon = document.createElement("span");
@@ -409,8 +416,58 @@ function createDiscountCard(properties) {
     markOos.appendChild(markOosIcon);
     reviewWrap.appendChild(markOos);
 
+    if (allowOffers) {
+        likes.classList.add("discount-review-btn-allowed");
+        likes.addEventListener("click", async (e) => {
+            await reviewDiscount(e, "like", shop_id, properties.product_name);
+        });
+        dislikes.classList.add("discount-review-btn-allowed");
+        dislikes.addEventListener("click", async (e) => {
+            await reviewDiscount(e, "dislike", shop_id, properties.product_name);
+        });
+        markOos.classList.add("discount-review-btn-allowed");
+    }
+
     cardBottomBar.appendChild(reviewWrap);
     card.appendChild(cardBottomBar);
 
     return card;
+}
+
+async function reviewDiscount(e,action, shop_id, product_name) {
+    switch(action) {
+        case "dislike":
+        case "like":
+            let target = e.target;
+            let actionCopy = action;
+            if (target.tagName == "SPAN") {
+                target = target.parentElement;
+            }
+            
+            if (target.classList.contains("discount-"+ action +"-active")) {
+                action = "none";
+            }
+            let response = await sameOriginPatchRequest(discountsEndpoint, {
+                rating: action,
+                shop_id: shop_id,
+                product_name: product_name,
+                longitude: longitude,
+                latitude: latitude,
+            });
+            if (response.status>=200 && response.status<300) {
+                let count = target.childNodes[1];
+                if (action === "none") {
+                    target.classList.remove("discount-"+ actionCopy +"-active");
+                    count.nodeValue = (parseInt(count.nodeValue) - 1 < 0) ? 0 : parseInt(count.nodeValue) - 1;
+                } else {
+                    target.classList.add("discount-"+ action +"-active");
+                    count.nodeValue = parseInt(count.nodeValue) + 1;
+                }
+            }
+            else if (response.status === 403) {
+                data = await response.json();
+                makeToast("failure", data.error, 3000);
+            }
+            break;
+    }
 }

@@ -199,6 +199,8 @@ nav {
 .discount {
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow: hidden;
     background-color: #fff;
     padding: 10px 25px;
     max-width: 300px;
@@ -299,15 +301,15 @@ nav {
     color:#39806E;
 }
 
-.discount-like {
+.discount-like-active {
     color: #056147;
 }
 
-.discount-dislike {
+.discount-dislike-active {
     color: #A44A3F;
 }
 
-.discount-mark-oos {
+.discount-mark-oos-active {
     color: #0f3650;
 }
 
@@ -327,4 +329,12 @@ nav {
     font-weight: 300;
     margin-top: 15vh;
     color: rgb(110, 110, 110);
+}
+
+.discount-review-btn-allowed {
+    cursor: pointer;
+}
+
+.discount-review-btn-allowed:hover {
+    transform: scale(1.1);
 }

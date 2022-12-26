@@ -1,3 +1,10 @@
+/*
+* Middleware for ensuring a request has the correct format
+* For GET requests, GET format object contains a list of expected parameters
+* For other requests, request format objects contain a list of expected headers, as well as another list of required body values
+* If inside a JSONArray, there is another JSONArray of values, it means that only one of those values is required (body only)
+*/
+
 const EXPECTED_DATA_POST = {
     "register": {
         "headers": [],
@@ -18,7 +25,7 @@ const EXPECTED_DATA_GET = {
 const EXPECTED_DATA_PATCH = {
     "discounts": {
         "headers": [],
-        "body": ["in_stock", "shop_id", "product_name"]
+        "body": [["in_stock", "rating"], "shop_id", "product_name", "latitude", "longitude"]
     }
 };
 
@@ -53,7 +60,21 @@ function matchSchema(obj, req_type, endpoint) {
         }
 
         for (let key of endpoint_data.body) {
-            if (obj.body[key] === undefined) {
+            // if key is option array
+            if (Array.isArray(key)) {
+                // count how many of those options exist in request
+                let flag = 0;
+                for (let key2 of key) {
+                    if (obj.body[key2] !== undefined) {
+                        ++flag;
+                    }
+                }
+                // if none or more than 1 exist, request is invalid
+                if (flag !== 1) {
+                    return false;
+                }
+            }
+            else if (obj.body[key] === undefined) {
                 return false;
             }
         }
