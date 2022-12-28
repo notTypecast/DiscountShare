@@ -174,7 +174,7 @@ function deleteAllCookies() {
     }
 }
 
-function createPagePopup(mountNode, headerNode, bodyNode, onLoad) {
+function createPagePopup(mountNode, headerNode, bodyNodes, onLoad) {
     let popup = document.createElement("div");
     popup.classList.add("page-popup");
     let popupHeader = document.createElement("div");
@@ -197,8 +197,10 @@ function createPagePopup(mountNode, headerNode, bodyNode, onLoad) {
     let popupBody = document.createElement("div");
     popupBody.classList.add("page-popup-body");
     popup.append(popupBody);
-    if (bodyNode !== undefined) {
-        popupBody.append(bodyNode);
+    if (bodyNodes !== undefined) {
+        for (let node of bodyNodes) {
+            popupBody.appendChild(node);
+        }
     }
 
     if (onLoad !== undefined) {
@@ -208,3 +210,51 @@ function createPagePopup(mountNode, headerNode, bodyNode, onLoad) {
     mountNode.appendChild(popup);
 }
 
+function createDropdown(className, dropdownID, options, defaultOption) {
+    let dropdown = document.createElement("select");
+    dropdown.classList.add(className);
+    dropdown.id = dropdownID;
+    let def = document.createElement("option");
+    def.setAttribute("disabled", "");
+    def.setAttribute("selected", "");
+    def.setAttribute("hidden", "");
+    def.value = defaultOption;
+    def.innerText = defaultOption;
+    dropdown.appendChild(def);
+    for (let option of options) {
+        let opt = document.createElement("option");
+        opt.value = option;
+        opt.innerText = option;
+        dropdown.appendChild(opt);
+    }
+    return dropdown;
+}
+
+function updateDropdown(ddown, options, defaultOption) {
+    ddown.innerHTML = "";
+    // add default option
+    let def = document.createElement("option");
+    def.setAttribute("disabled", "");
+    def.setAttribute("selected", "");
+    def.setAttribute("hidden", "");
+    def.value = defaultOption;
+    def.innerText = defaultOption;
+    ddown.appendChild(def);
+    for (let option of options) {
+        let opt = document.createElement("option");
+        opt.value = option;
+        opt.innerText = option;
+        ddown.appendChild(opt);
+    }
+}
+
+function emptyDropdown(ddown, defaultOption) {
+    ddown.innerHTML = "";
+    let def = document.createElement("option");
+    def.setAttribute("disabled", "");
+    def.setAttribute("selected", "");
+    def.setAttribute("hidden", "");
+    def.value = defaultOption;
+    def.innerText = defaultOption;
+    ddown.appendChild(def);
+}

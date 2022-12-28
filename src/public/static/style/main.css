@@ -13,6 +13,10 @@ nav {
     justify-content: space-between;
 }
 
+.nav-burger-menu {
+    display: none;
+}
+
 .nav-logo {
     font-family: "Poppins", sans-serif;
     font-weight: 400;
@@ -116,15 +120,15 @@ nav {
 
 .filters-wrap {
     position: fixed;
-    bottom: calc(-35vh + 4.2rem - 67px);
+    bottom: -35vh;
     right: 4rem;
     width: 25%;
-    min-width: 200px;
+    min-width: 350px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     background-color: #EEF0F2;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-    z-index: 1001;
+    z-index: 1002;
 }
 
 .filters-header {
@@ -133,7 +137,7 @@ nav {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    height: 4.2rem;
+    height: 3.8rem;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     background-color: #000;
@@ -196,20 +200,27 @@ nav {
     justify-content: center;
 }
 
+.discount-oos h4, .discount-oos img, .discount-oos p, .discount-oos span {
+    opacity: 0.5;
+}
+
 .discount {
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
     background-color: #fff;
-    padding: 10px 25px;
+    padding: 10px 35px;
     max-width: 300px;
     margin: 20px 20px;
+    /*
     border-top-right-radius: 3px;
     border-top-left-radius: 3px;
     border-bottom-right-radius: 7px;
     border-bottom-left-radius: 7px;
-    border-top: solid 3px #39806E;
+    border-bottom: solid 3px #39806E;
+    */
+    border-radius: 15px;
     font-family: "Roboto", sans-serif;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
@@ -227,8 +238,14 @@ nav {
 }
 
 .discount-stock-status {
+    opacity: 1 !important;
     color: rgb(49, 49, 49);
     font-weight: 300;
+}
+
+.discount-out-of-stock {
+    color: rgb(201, 39, 39);
+    font-weight: 700;
 }
 
 .discount-title {
@@ -337,4 +354,309 @@ nav {
 
 .discount-review-btn-allowed:hover {
     transform: scale(1.1);
+}
+
+.discount-oos .discount-review-btn {
+    display: none;
+}
+
+.discount-mark-bis {
+    opacity: 1 !important;
+    vertical-align: middle;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-weight: 700;
+    cursor: pointer;
+    color: #266dd3;
+}
+
+.discount-mark-bis:hover {
+    color: #397edd;
+}
+
+.discount-mark-bis:hover .material-icons{
+    color: #397edd;
+}
+
+.discount-mark-bis .material-icons {
+    margin-right: 4px;
+    color: #266dd3;
+    opacity: 1 !important;
+}
+
+
+
+.discount-add-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin: 0 auto;
+    align-items: center;
+}
+
+.discount-add-clear {
+    text-decoration: underline;
+    color: #056147;
+    user-select: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.discount-add-btn {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: #056147;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+.discount-add-btn-inactive {
+    display: none;
+}
+.discount-add-btn:hover {
+    background-color: #08805e;
+}
+
+.discount-add-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+}
+
+.discount-categories-dropdown {
+    background-color: #fff;
+    color:rgb(95, 95, 95);
+    font-family: "Roboto", sans-serif;
+    font-size: 1rem;
+    border: none;
+    width: 80%;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.discount-add-price {
+    width:20%;
+    min-width: 100px;
+    text-align: center;
+    padding: 15px 10px;
+    outline:none;
+    font-family: "Roboto";
+    font-weight: 300;
+    border:none;
+    margin-top:15px;
+    margin-bottom:15px;
+    font-size: 1rem;
+    border-radius:5px;
+    color: rgb(34, 34, 34);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    border-bottom: solid 1px rgb(206, 206, 206);
+    transition: all .25s;
+}
+
+.discount-add-price:focus {
+    box-shadow: rgba(57, 128, 110, 0.1) 0px 4px 12px;
+    border-bottom: solid 1px #39806E;
+}
+
+.discount-add-submit {
+    font-family: "Roboto", sans-serif;
+    padding: 10px 20px;
+    background-color:#000;
+    color: #fff;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: rgba(57, 128, 110, 0.1) 0px 4px 12px;
+}
+
+.discount-add-submit {
+    padding: 10px 50px;
+    color: #fff;
+    cursor: pointer;
+    border:none;
+    font-family: 'Roboto';
+    font-weight: 300;
+    font-size: 1rem;
+    border-radius: 50px;
+    background-color:#39806E;
+    margin-bottom: 25px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    outline:none;
+}
+
+.discount-add-submit:hover {
+    background-color:#316e5f;
+}
+
+.discount-add-submit:active {
+    background-color:#31695b;
+}
+
+.discount-add-search-wrap {
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.discount-add-search-element {
+    position: relative;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+}
+
+.discount-add-search {
+    width: 100%;
+    font-family: "Roboto", sans-serif;
+    font-size: 1rem;
+    padding: 17px 20px;
+    border: none;
+    outline: none;
+    border-radius: 50px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.search-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color:rgb(63, 63, 63);
+    height: 100%;
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.discount-add-search-results-wrap {
+    width: 100%;
+    max-height:300px;
+    overflow: auto;
+    display: block;
+    position: relative;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.discount-add-search-result {
+    width: 100%;
+    background-color: #fff;
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    color:rgb(34, 34, 34);
+    text-align: left;
+    border-bottom: solid 1px rgb(206, 206, 206);
+}
+.discount-add-search-result:hover {
+    background-color: rgb(241, 241, 241);
+}
+
+.discount-add-search-result img {
+    width: 50px;
+    margin-right: 7px;
+}
+
+.discount-add-or {
+    color:rgb(71, 71, 71);
+    font-size: 1.1rem;
+}
+
+.discount-add-search-result-selected {
+    width: 100%;
+    color:rgb(71, 71, 71);
+    justify-content: center;
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    user-select: none;
+    color:rgb(34, 34, 34);
+    text-align: left;
+}
+
+.discount-add-search-result-selected img {
+    width: 50px;
+    margin-right: 7px;
+}
+
+
+
+@media (max-width: 768px) {
+    .nav-btn-container {
+        display: none;
+    }
+    .nav-container {
+        display: inline-block;
+        text-align: center;
+        width: 100%;
+        position: relative;
+    }
+
+    .nav-logo {
+        width: 100%;
+    }
+
+    .nav-burger-menu {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 4rem;
+        width: 4rem;
+    }
+
+    .nav-btn-container-visible {
+        display: block;
+        top: 4rem;
+        position: absolute;
+        left:0;
+        width: 100%;
+        z-index: 999999;
+        background-color: #EEF0F2;
+        border-bottom: solid 2px #39806E;
+    }
+
+    .nav-btn {
+        width: 100%;
+        display: block;
+        position: relative;
+    }
+
+    .filters-wrap {
+        width: 90%;
+        margin: 0 auto;
+        left:5%;
+    }
+
+    .popup-title {
+        font-size: 1rem;
+    }
+
+    .discount-add-wrap {
+        width: 90%;
+    }
+
 }

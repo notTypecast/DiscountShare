@@ -1,6 +1,40 @@
 import fs from "fs/promises";
 import { promiseQuery } from '../util/query.js';
 
+async function getProducts(search_term, category_id, subcategory_id) {
+    let st = search_term !== undefined;
+    let c = category_id !== undefined;
+    let s = subcategory_id !== undefined;
+
+    let query = "SELECT * FROM product WHERE ";
+    let args = [];
+
+    if (st) {
+        query += "name LIKE ? ";
+        args.push("%" + search_term + "%");
+        if (c || s) {
+            query += "AND ";
+        }
+    }
+
+    if (c) {
+        query += "category_id=? ";
+        args.push(category_id);
+        if (s) {
+            query += "AND ";
+        }
+    }
+
+    if (s) {
+        query += "subcategory_id=?";
+        args.push(subcategory_id);
+    }
+
+    let results = await promiseQuery(query, args);
+
+    return results;
+}
+
 async function updateProductsFromFile(filepath) {
     let data = await fs.readFile(filepath);
     const jsonData = JSON.parse(data);
@@ -26,4 +60,4 @@ async function updateProductsFromFile(filepath) {
     await promiseQuery(products_sql, [product_data]);
 }
 
-export { updateProductsFromFile };
+export { updateProductsFromFile, getProducts };

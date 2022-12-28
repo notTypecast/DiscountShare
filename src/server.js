@@ -31,6 +31,7 @@ import { loginRouter } from "./routes/login.js";
 import { shopsRouter } from "./routes/shops.js";
 import { categoriesRouter } from "./routes/categories.js"
 import { discountsRouter } from "./routes/discounts.js";
+import { productsRouter } from "./routes/products.js";
 
 app.use(cors());
 app.use(cookieParser());
@@ -40,6 +41,7 @@ app.use("/api/", loginRouter);
 app.use("/api/", shopsRouter);
 app.use("/api/", categoriesRouter);
 app.use("/api/", discountsRouter);
+app.use("/api/", productsRouter);
 
 app.get("/", requireAuth);
 app.get("/login", loggedIn);

@@ -1,4 +1,4 @@
-import { getDiscounts, setInStock, setRating, removeRating } from "../models/discountModel.js";
+import { getDiscounts, addDiscount, setInStock, setRating, removeRating } from "../models/discountModel.js";
 
 async function discountsControllerGet(req, res) {
     let shop_id = req.query.shop_id;
@@ -12,6 +12,24 @@ async function discountsControllerGet(req, res) {
     }
 
     return res.status(200).json(results);
+}
+
+async function discountsControllerPost(req, res) {
+    let shop_id = req.body.shop_id;
+    let product_name = req.body.product_name;
+    let cost = req.body.cost;
+    let username = res.locals.user_data.username;
+    let results;
+    try {
+        results = await addDiscount(shop_id, product_name, cost, username);
+    } catch (err) {
+        if (err.sqlState === "45001") {
+            return res.status(403).json({error: "Similar discount already exists for product in this store."})
+        }
+    }
+
+    return res.status(200).end();
+
 }
 
 async function discountsControllerPatch(req, res) {
@@ -57,4 +75,4 @@ async function discountsControllerPatch(req, res) {
     return res.status(200).end();
 }
 
-export { discountsControllerGet, discountsControllerPatch };
+export { discountsControllerGet, discountsControllerPost, discountsControllerPatch };

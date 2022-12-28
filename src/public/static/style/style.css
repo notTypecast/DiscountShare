@@ -317,3 +317,10 @@ input[type="radio"] + label:before {
     font-weight: 300;
     font-family: "Roboto", sans-serif;
 }
+
+@media (max-width: 768px) {
+    .toast {
+        width: 90%;
+        left:5%;
+    }
+}

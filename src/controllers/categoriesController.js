@@ -1,10 +1,15 @@
-import { getCategories } from "../models/categoryModel.js";
+import { getCategories, getSubcategoriesByCategory } from "../models/categoryModel.js";
 
 async function categoriesController(req, res) {
     let results;
     
     try {
-        results = await getCategories();
+        if (req.query.category_id === undefined) {
+            results = await getCategories();
+        }
+        else {
+            results = await getSubcategoriesByCategory(req.query.category_id);
+        }
     } catch (err) {
         console.log(err);
         return res.status(500).json({error: "Internal server error."});

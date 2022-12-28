@@ -33,22 +33,28 @@ async function getDiscounts(shop_id, username) {
     return results;
 }
 
+async function addDiscount(shop_id, product_name, cost, username) {
+    await promiseQuery("INSERT INTO discount(shop_id, product_name, cost, username, posted, expiry) VALUES (?, ?, ?, ?, NOW(), NOW() + INTERVAL 1 WEEK)", [shop_id, product_name, cost, username]);
+
+    return null;
+}
+
 async function setInStock(shop_id, product_name, value) {
-    let result = await promiseQuery("UPDATE discount SET in_stock=? WHERE shop_id=? AND product_name=?", [value, shop_id, product_name]);
+    await promiseQuery("UPDATE discount SET in_stock=? WHERE shop_id=? AND product_name=?", [value, shop_id, product_name]);
 
     return null;
 }
 
 async function setRating(username, shop_id, product_name, rating) {
-    let result = await promiseQuery("INSERT INTO review(username, shop_id, product_name, rating) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating=?", [username, shop_id, product_name, rating, rating]);
+    await promiseQuery("INSERT INTO review(username, shop_id, product_name, rating) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating=?", [username, shop_id, product_name, rating, rating]);
 
     return null;
 }
 
 async function removeRating(username, shop_id, product_name) {
-    let result = await promiseQuery("DELETE FROM review WHERE username=? AND shop_id=? AND product_name=?", [username, shop_id, product_name]);
+    await promiseQuery("DELETE FROM review WHERE username=? AND shop_id=? AND product_name=?", [username, shop_id, product_name]);
 
     return null;
 }
 
-export { getDiscounts, setInStock, setRating, removeRating };
+export { getDiscounts, addDiscount, setInStock, setRating, removeRating };
