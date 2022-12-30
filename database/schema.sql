@@ -5,6 +5,7 @@ USE DiscountShare;
 DROP TABLE IF EXISTS review;
 DROP TABLE IF EXISTS price;
 DROP TABLE IF EXISTS discount;
+DROP TABLE IF EXISTS expired_discount;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS administrator;
 DROP TABLE IF EXISTS shop;
@@ -63,7 +64,7 @@ CREATE TABLE product (
 CREATE TABLE price (
     product_name VARCHAR(255) NOT NULL,
     day_date DATE NOT NULL,
-    cost FLOAT NOT NULL,
+    cost DECIMAL(10, 2) NOT NULL,
     PRIMARY KEY (product_name, day_date),
     FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE    
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -71,7 +72,7 @@ CREATE TABLE price (
 CREATE TABLE discount (
     shop_id VARCHAR(255) NOT NULL,
     product_name VARCHAR(255) NOT NULL,
-    cost FLOAT NOT NULL,
+    cost DECIMAL(10, 2) NOT NULL,
     username VARCHAR(24) NOT NULL,
     posted DATETIME NOT NULL,
     expiry DATETIME NOT NULL,
@@ -91,4 +92,19 @@ CREATE TABLE review (
     FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (shop_id) REFERENCES shop(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE expired_discount (
+    discount_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    shop_id VARCHAR(255) NOT NULL,
+    product_name VARCHAR(255) NOT NULL,
+    cost DECIMAL(10, 2) NOT NULL,
+    username VARCHAR(24) NOT NULL,
+    posted DATETIME NOT NULL,
+    expiry DATETIME NOT NULL,
+    likes INT NOT NULL,
+    dislikes INT NOT NULL,
+    FOREIGN KEY (shop_id) REFERENCES shop(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

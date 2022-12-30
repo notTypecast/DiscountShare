@@ -107,7 +107,7 @@ submitButton.addEventListener("click", async (e) => {
     hideLoader();
 
     if (response.status >= 400) {
-        makeToast("failure", "Failed to register!", 3000);
+        makeToast("failure", body.error, 3000);
     }
     else if (response.status >= 200 && response.status < 300) {
         makeToast("success", "Successfully registered user!", 3000);

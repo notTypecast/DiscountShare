@@ -23,12 +23,16 @@ async function discountsControllerPost(req, res) {
     try {
         results = await addDiscount(shop_id, product_name, cost, username);
     } catch (err) {
-        if (err.sqlState === "45001") {
-            return res.status(403).json({error: "Similar discount already exists for product in this store."})
+        if (err.sqlState === "45000") {
+            return res.status(403).json({error: err.sqlMessage});
         }
+
+        console.log(err);
+
+        
     }
 
-    return res.status(200).end();
+    return res.status(200).json(results);
 
 }
 
@@ -61,7 +65,7 @@ async function discountsControllerPatch(req, res) {
                 await setRating(username, shop_id, product_name, rating);
             } catch (err) {
                 if (err.sqlState === '45000') {
-                    return res.status(403).json({error: "Cannot rate own post."});
+                    return res.status(403).json({error: err.sqlMessage});
                 }
                 console.log(err);
                 return res.status(500).json({error: "Internal server error."});

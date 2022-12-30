@@ -33,6 +33,10 @@ const EXPECTED_DATA_PATCH = {
     "discounts": {
         "headers": [],
         "body": [[0, "in_stock", "rating"], "shop_id", "product_name", "latitude", "longitude"]
+    },
+    "user": {
+        "headers": [],
+        "body": ["new_username", "new_password_b64"]
     }
 };
 

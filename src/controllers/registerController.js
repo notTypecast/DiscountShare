@@ -44,17 +44,13 @@ async function registerController(req, res) {
     // hash password securely to store in database
     let hashedPassword = await hashPassword(password);
 
-    let errval = await insertUser(req.body.username, hashedPassword, req.body.email);
-
-
-    // set jwt token cookie for new user
-    if (errval === null) {
+    try {
+        await insertUser(req.body.username, hashedPassword, req.body.email);
         let token = createJWT(req.body.username);
         return res.status(200).json({session_token: token});  
+    } catch (err) {
+        return res.status(409).json({error: "Username unavailable."});
     }
-
-    return res.status(409).json({error: "Username unavailable."});
-
 }
 
 

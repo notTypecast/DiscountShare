@@ -34,9 +34,11 @@ async function getDiscounts(shop_id, username) {
 }
 
 async function addDiscount(shop_id, product_name, cost, username) {
-    await promiseQuery("INSERT INTO discount(shop_id, product_name, cost, username, posted, expiry) VALUES (?, ?, ?, ?, NOW(), NOW() + INTERVAL 1 WEEK)", [shop_id, product_name, cost, username]);
+    await promiseQuery("INSERT INTO discount(shop_id, product_name, cost, username, posted, expiry) VALUES (?, ?, ?, ?, NOW(), NOW() + INTERVAL 1 WEEK) ON DUPLICATE KEY UPDATE cost=VALUES(cost), username=VALUES(username), posted=VALUES(posted), expiry=VALUES(expiry), in_stock=1", [shop_id, product_name, cost, username]);
 
-    return null;
+    let result = await promiseQuery("SELECT @discount_condition_value AS condition_value", null);
+
+    return result;
 }
 
 async function setInStock(shop_id, product_name, value) {
@@ -46,7 +48,7 @@ async function setInStock(shop_id, product_name, value) {
 }
 
 async function setRating(username, shop_id, product_name, rating) {
-    await promiseQuery("INSERT INTO review(username, shop_id, product_name, rating) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating=?", [username, shop_id, product_name, rating, rating]);
+    await promiseQuery("INSERT INTO review(username, shop_id, product_name, rating) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating=VALUES(rating)", [username, shop_id, product_name, rating]);
 
     return null;
 }

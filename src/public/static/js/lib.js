@@ -34,6 +34,12 @@ const makeToast = (type, msg, duration) => {
             icon.innerHTML = "done";
             toast.appendChild(icon);
             break;
+        case "partial-success":
+            toast.classList.add("partial-success-toast");
+            toast.innerHTML = msg;
+            icon.innerHTML = "done";
+            toast.appendChild(icon);
+            break;
         case "failure":
             toast.classList.add("failure-toast");
             toast.innerHTML = msg;

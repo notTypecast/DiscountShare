@@ -213,16 +213,10 @@ nav {
     padding: 10px 35px;
     max-width: 300px;
     margin: 20px 20px;
-    /*
-    border-top-right-radius: 3px;
-    border-top-left-radius: 3px;
-    border-bottom-right-radius: 7px;
-    border-bottom-left-radius: 7px;
-    border-bottom: solid 3px #39806E;
-    */
     border-radius: 15px;
     font-family: "Roboto", sans-serif;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    justify-content: space-between;
 }
 
 .discount-top-bar {

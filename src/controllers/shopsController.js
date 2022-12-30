@@ -10,6 +10,7 @@ async function shopsController(req, res) {
     try {
         results = await getShops(req.query.category_id);
     } catch (err) {
+        console.log(err);
         return res.status(500).json({error: "Internal server error."});
     }
 

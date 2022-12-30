@@ -43,9 +43,8 @@ submitButton.addEventListener("click", async (e) => {
 
     hideLoader();
     if (response.status == 403) {
-        makeToast("failure", "Invalid credentials!", 3000);
+        makeToast("failure", body.error, 3000);
     } else if (response.status >= 200 && response.status < 300) {
-        console.log(response);
         makeToast("success", "Successfully logged in!", 3000);
         document.cookie = "session_token=" + body.session_token+"; SameSite=Lax";
         window.location.href="/";
