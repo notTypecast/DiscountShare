@@ -62,20 +62,41 @@ const makeToast = (type, msg, duration) => {
 
 
 // create input warning text
-const warningWrap = document.createElement("div");
-warningWrap.classList.add("warning-wrap");
-const warnings = {};
-let btn;
+const g_warningWrap = document.createElement("div");
+g_warningWrap.classList.add("warning-wrap");
+const g_warnings = {};
+let g_btn;
 
 function setSubmitButton(button) {
-    btn = button;
+    g_btn = button;
 }
 
-function setWarningLocation(beforeNode) {
+function setWarningLocation(beforeNode, injected) {
+    let warningWrap = g_warningWrap;
+    if (injected !== undefined) {
+        injected.warningWrap = document.createElement("div");
+        warningWrap.classList.add("warning-wrap");
+        injected.warnings = {};
+        warningWrap = injected.warningWrap;
+    }
     beforeNode.parentNode.insertBefore(warningWrap, beforeNode);
 }
 
-function addWarning(inputNode, warning) {
+function addWarning(inputNode, warning, injected) {
+    let warnings = g_warnings;
+    let btn = g_btn;
+    let warningWrap = g_warningWrap;
+    if (injected !== undefined) {
+        if (injected.warningWrap !== undefined) {
+            warningWrap = injected.warningWrap;
+        }
+        if (injected.warnings !== undefined) {
+            warnings = injected.warnings;
+        }
+        if (injected.btn !== undefined) {
+            btn = injected.btn;
+        }
+    }
     if (warnings[inputNode.id] == undefined) {
         warnings[inputNode.id] = document.createElement("div");
         warningWrap.appendChild(warnings[inputNode.id]);
@@ -94,7 +115,19 @@ function addWarning(inputNode, warning) {
     catch (err) {}
 }
 
-function removeWarnings(inputNode) {
+function removeWarnings(inputNode, injected) {
+    let warnings = g_warnings;
+    let btn = g_btn;
+    if (injected !== undefined) {
+        if (injected.warnings !== undefined) {
+            warnings = injected.warnings;
+        }
+        if (injected.btn !== undefined) {
+            btn = injected.btn;
+        }
+    }
+
+
     if (inputNode.classList.contains("warning-input")) {
         inputNode.classList.remove("warning-input");
     }
@@ -180,7 +213,7 @@ function deleteAllCookies() {
     }
 }
 
-function createPagePopup(mountNode, headerNode, bodyNodes, onLoad) {
+function createPagePopup(mountNode, headerNode, bodyNodes, onLoad, onClose) {
     let popup = document.createElement("div");
     popup.classList.add("page-popup");
     let popupHeader = document.createElement("div");
@@ -192,6 +225,9 @@ function createPagePopup(mountNode, headerNode, bodyNodes, onLoad) {
     closeBtn.innerHTML = "close";
     closeBtn.addEventListener("click", () => {
         popup.remove();
+        if (onClose !== undefined) {
+            onClose();
+        }
     });  
     popup.append(closeBtn);
 
@@ -263,4 +299,9 @@ function emptyDropdown(ddown, defaultOption) {
     def.value = defaultOption;
     def.innerText = defaultOption;
     ddown.appendChild(def);
+}
+
+function logout() {
+    deleteAllCookies();
+    window.location.href = "/login";
 }

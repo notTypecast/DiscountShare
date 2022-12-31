@@ -56,13 +56,13 @@ burgerMenu.addEventListener("click", (e) => {
     document.querySelector(".nav-btn-container").classList.toggle("nav-btn-container-visible");
 });
 
-logoutBtn.addEventListener("click", (e) => {
-    deleteAllCookies();
-    window.location.href = "/login";
-});
+logoutBtn.addEventListener("click", logout);
 
 let mainMap = L.map('map', {attributionControl: false});
-let mainTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+let mainTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    noWrap: true,
+    minZoom: 2
+});
 mainTiles.addTo(mainMap);
 
 
@@ -152,7 +152,6 @@ async function loadShops(category_id) {
             brand: row.brand,
             website: row.website,
             phone_number: row.phone_number,
-            discountCount: row.discountCount,
             allowOffers: row.allowOffers
         }));
         marker.bindPopup(popup);
@@ -177,13 +176,11 @@ function createPopup(properties) {
     titleNode.innerText = properties.title;
     popup.appendChild(titleNode);
 
-    let discountCount = properties.discountCount;
     let shop_id = properties.id;
     allowOffers = properties.allowOffers;
     // "remove" name and id from properties since they are already dislayed as title
     properties.name = null;
     properties.id = null;
-    properties.discountCount = null;
     properties.allowOffers = null;
 
     for (let property in properties) {
@@ -205,17 +202,11 @@ function createPopup(properties) {
         popupHeader.innerHTML = "Showing discounts for <span>" + properties.title + "</span>";
 
         let popupBody;
-        if (discountCount > 0) {
-            showLoader();
-            popupBody = await loadDiscounts(shop_id, allowOffers);
-            hideLoader();
-        } else {
-            popupBody = document.createElement("p");
-            popupBody.classList.add("no-discounts");
-            popupBody.innerText = "No discounts available.";
-        }
+        showLoader();
+        popupBody = await loadDiscounts(shop_id, allowOffers);
+        hideLoader();
         currentShopId = shop_id;
-        createPagePopup(document.body, popupHeader, allowOffers? withAddDiscountFunctionality(popupBody) : [popupBody]);
+        createPagePopup(document.body, popupHeader, allowOffers? withAddDiscountFunctionality(popupBody) : [popupBody], undefined, loadShops);
     });
     popup.appendChild(showDiscountsBtn);
 
@@ -230,7 +221,7 @@ function addUserPositionMarker() {
         });
         let posTitle = document.createElement("h3");
         posTitle.classList.add("popup-title");
-        posTitle.innerText = "Your position";
+        posTitle.innerText = "Your location";
         let popup = L.popup().setContent(posTitle);
         marker.bindPopup(popup);
         marker.addTo(mainMap);
@@ -334,7 +325,10 @@ function createDiscountCard(properties, allowOffers, shop_id, index) {
     let cardBanner = document.createElement("img");
     cardBanner.classList.add("discount-banner");
     cardBanner.src = properties.image_link;
-    card.appendChild(cardBanner);
+    let cardBannerWrap = document.createElement("div");
+    cardBannerWrap.classList.add("discount-banner-wrap");
+    cardBannerWrap.appendChild(cardBanner);
+    card.appendChild(cardBannerWrap);
 
     let cardTitle = document.createElement("h4");
     cardTitle.classList.add("discount-title");
@@ -482,7 +476,7 @@ async function reviewDiscount(e, action, shop_id, product_name) {
                 action = "none";
             }
 
-            let complementaryAction = (action === "like") ? "dislike" : "like";
+            let complementaryAction = (action === "none")? null : (action === "like") ? "dislike" : "like";
             let complementaryBtn = target.parentElement.querySelector(".discount-"+ complementaryAction +"-active");
             if (complementaryBtn !== null) {
                 complementaryBtn.classList.remove("discount-"+ complementaryAction +"-active");
@@ -607,14 +601,16 @@ function withAddDiscountFunctionality(bodyNode) {
     discAddBtn.appendChild(discAddBtnIcon);
 
     discAddWrap.appendChild(discAddBtn);
+    let discAddForm = createDiscountModal(discAddWrap);
     
     discAddBtn.addEventListener("click", (e) => {
-        createDiscountModal(discAddWrap);
         let target = e.target;
         if (target.tagName == "SPAN") {
             target = target.parentElement;
         }
         target.classList.add("discount-add-btn-inactive");
+        discAddForm.classList.remove("discount-add-form-inactive");
+
     });
 
     return [discAddWrap, bodyNode]
@@ -623,6 +619,8 @@ function withAddDiscountFunctionality(bodyNode) {
 function createDiscountModal(discAddWrap, properties) {
     let discAddForm = document.createElement("div");
     discAddForm.classList.add("discount-add-form");
+    discAddForm.classList.add("discount-add-form-inactive");
+
 
     // create "clear" button
     let discAddClear = document.createElement("a");
@@ -692,17 +690,16 @@ function createDiscountModal(discAddWrap, properties) {
     discAddSearchWrap.appendChild(discAddSearchResultsWrap);
     discAddForm.appendChild(discAddSearchWrap);
 
-    /*
-    <input type="text" placeholder="Price (€)" class="discount-add-price">
-    <button class="discount-add-submit">Add discount</button>
-    */
     let discAddPrice = document.createElement("input");
     discAddPrice.type = "number";
     discAddPrice.placeholder = "Price (€)";
     discAddPrice.id="addDiscountPriceField"
     discAddPrice.addEventListener("keydown", (e) => {
-        if (!(e.key >= 0 && e.key <= 9 || e.key == "Backspace" || e.key == "Delete" || e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "ArrowUp" || e.key == "ArrowDown" || e.key == "Enter" || e.key == "." || e.key == ",")) {
+        if (!(e.key >= 0 && e.key <= 9 || e.key == "Backspace" || e.key == "Delete" || e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "ArrowUp" || e.key == "ArrowDown" || e.key == "Enter" || e.key == "." || e.key == "," || e.key == "Home" || e.key == "End")) {
             e.preventDefault();
+        }
+        if (e.key == "Enter") {
+            addDiscount();
         }
     });
     discAddPrice.classList.add("discount-add-price");
@@ -712,6 +709,8 @@ function createDiscountModal(discAddWrap, properties) {
     discAddSubmit.innerText = "Add discount";
     discAddForm.appendChild(discAddSubmit);
     discAddSubmit.addEventListener("click", addDiscount);
+
+    return discAddForm;
 
 }
 
@@ -770,11 +769,10 @@ async function subcategoryChangeEvent(e) {
 }
 
 function clearSelections(e) {
-    let target = e.target;
-    let catDropdown = target.parentElement.querySelector("#catDropdown");
-    let subcatDropdown = target.parentElement.querySelector("#subcatDropdown");
-    let prodDropdown = target.parentElement.querySelector("#prodDropdown");
-    let searchBar = target.parentElement.querySelector(".discount-add-search");
+    let catDropdown = document.querySelector("#catDropdown");
+    let subcatDropdown = document.querySelector("#subcatDropdown");
+    let prodDropdown = document.querySelector("#prodDropdown");
+    let searchBar = document.querySelector(".discount-add-search");
     let resultsWrap = document.getElementById("discountAddSearchResultsWrap");
 
     // revert to default, since categories should not be cleared
@@ -845,6 +843,13 @@ async function loadDiscounts(shop_id, allowOffers) {
     response = await response.json();
     let discountsWrap = document.createElement("div");
     discountsWrap.classList.add("discounts-wrap");
+    if (response.length == 0) {
+        popupBody = document.createElement("p");
+        popupBody.classList.add("no-discounts");
+        popupBody.innerText = "No discounts available.";
+        discountsWrap.appendChild(popupBody);
+        return discountsWrap;
+    }
     for (let i =0; i < response.length; i++) {
         discountsWrap.appendChild(createDiscountCard(response[i], allowOffers, shop_id, i));
     }
@@ -865,9 +870,12 @@ function populateSearchResults(products) {
         */
         let productResult = document.createElement("span");
         productResult.classList.add("discount-add-search-result");
+        let productResultImgWrap = document.createElement("div");
+        productResultImgWrap.classList.add("discount-add-search-result-img-wrap");
         let productImage = document.createElement("img");
         productImage.src = product.image_link;
-        productResult.appendChild(productImage);
+        productResultImgWrap.appendChild(productImage);
+        productResult.appendChild(productResultImgWrap);
         productResult.appendChild(document.createTextNode(product.name));
         productResult.addEventListener("click", (e) => {
             let resultsWrap = document.querySelector("#discountAddSearchResultsWrap");
@@ -875,9 +883,12 @@ function populateSearchResults(products) {
             let selected = document.createElement("span");
             selected.id = "selectedSearchResult";
             selected.classList.add("discount-add-search-result-selected");
+            let productImgWrap = document.createElement("div");
+            productImgWrap.classList.add("discount-add-search-result-img-wrap");
             let productImage = document.createElement("img");
             productImage.src = product.image_link;
-            selected.appendChild(productImage);
+            productImgWrap.appendChild(productImage);
+            selected.appendChild(productImgWrap);
             selected.appendChild(document.createTextNode(product.name));
             resultsWrap.append(selected);
         });
@@ -888,7 +899,16 @@ function populateSearchResults(products) {
 
 async function addDiscount(e) {
     let price = document.getElementById("addDiscountPriceField").value;
-    let selectedProductName = document.getElementById("selectedSearchResult").childNodes[1].textContent;
+    if (price.length == 0) {
+        makeToast("failure", "Please enter a price.", 3000);
+        return;
+    }
+    let selectedProductName = document.getElementById("selectedSearchResult");
+    if (selectedProductName === null) {
+        makeToast("failure", "Please select a product.", 3000);
+        return;
+    }
+    selectedProductName = selectedProductName.childNodes[1].textContent;
 
     showLoader();
     let response = await sameOriginPostRequest(discountsEndpoint, {
@@ -901,16 +921,19 @@ async function addDiscount(e) {
 
     if (response.status>=200 && response.status<300) {
         switch(data.condition_value) {
-            case "0":
+            case 0:
                 makeToast("partial-success", "Successfully added discount, but no points were awarded.", 3000);
                 break
-            case "1":
+            case 1:
                 makeToast("success", "Successfully added discount. You were awarded 20 points.", 3000);
                 break;
-            case "2":
+            case 2:
                 makeToast("success", "Successfully added discount. You were awarded 50 points.", 3000);
                 break;
         }
+
+        document.getElementById("addDiscountBtn").classList.remove("discount-add-btn-inactive");
+        document.querySelector(".discount-add-form").classList.add("discount-add-form-inactive");
         let discountsWrap = document.querySelector(".discounts-wrap");
         if (discountsWrap === null) {
             discountsWrap = document.querySelector(".no-discounts");
@@ -918,6 +941,7 @@ async function addDiscount(e) {
         
         document.getElementById("addDiscountPriceField").value = "";
         document.getElementById("selectedSearchResult").remove();
+        clearSelections();
 
         showLoader();
         let newWrap = await loadDiscounts(currentShopId, allowOffers);

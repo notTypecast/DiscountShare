@@ -7,10 +7,14 @@ async function getDiscounts(shop_id, username) {
         ELSE 0 END) AS condition_value,
     COUNT(CASE WHEN review.rating='like' THEN 1 ELSE NULL END) AS likes, COUNT(CASE WHEN review.rating='dislike' THEN 1 ELSE NULL END) AS dislikes,
     r_usr.rating AS current_rating,
-    posted, expiry, in_stock, image_link, total_review_score
+    posted, expiry, in_stock, image_link, (CASE WHEN total_review_score >= 0 THEN total_review_score ELSE 0 END) as total_review_score
     FROM discount 
     LEFT JOIN review ON discount.shop_id=review.shop_id AND discount.product_name=review.product_name
-    LEFT JOIN review AS r_usr ON r_usr.username=?
+    LEFT JOIN (
+        SELECT rating, shop_id, product_name
+        FROM review 
+        WHERE username=?
+    ) as r_usr ON discount.shop_id=r_usr.shop_id AND discount.product_name=r_usr.product_name
     LEFT JOIN (
         SELECT price.product_name, price.cost
         FROM price INNER JOIN (
@@ -28,7 +32,8 @@ async function getDiscounts(shop_id, username) {
     INNER JOIN product ON discount.product_name=product.name
     INNER JOIN user ON discount.username=user.username
     WHERE discount.shop_id=?
-    GROUP BY discount.product_name, discount.username, discount.cost, condition_value, current_rating, posted, expiry, in_stock, image_link, total_review_score`, [username, shop_id]);
+    GROUP BY discount.product_name, discount.username, discount.cost, condition_value, current_rating, posted, expiry, in_stock, image_link, total_review_score
+    ORDER BY condition_value DESC, expiry DESC`, [username, shop_id]);
 
     return results;
 }
@@ -38,7 +43,7 @@ async function addDiscount(shop_id, product_name, cost, username) {
 
     let result = await promiseQuery("SELECT @discount_condition_value AS condition_value", null);
 
-    return result;
+    return result[0];
 }
 
 async function setInStock(shop_id, product_name, value) {

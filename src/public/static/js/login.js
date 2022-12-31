@@ -44,11 +44,13 @@ submitButton.addEventListener("click", async (e) => {
     hideLoader();
     if (response.status == 403) {
         makeToast("failure", body.error, 3000);
+        passwordInput.value="";
     } else if (response.status >= 200 && response.status < 300) {
         makeToast("success", "Successfully logged in!", 3000);
         document.cookie = "session_token=" + body.session_token+"; SameSite=Lax";
         window.location.href="/";
     } else {
         makeToast("failure", "Failed to log in!", 3000);
+        passwordInput.value="";
     }
 });

@@ -170,8 +170,8 @@ body {
 .toast {
     display: inline-block;
     position: fixed;
-    width:25%;
-    left:37.5%;
+    width:40%;
+    left:30%;
     bottom:50px;
     line-height: 50px;
     background-color:#056147;
@@ -195,7 +195,7 @@ body {
 }
 
 .partial-success-toast {
-    background-color:#df6d21;
+    background-color:#3e21df;
 }
 .failure-toast {
     background-color:#A44A3F;
@@ -290,9 +290,9 @@ input[type="radio"] + label:before {
 }
     
 .page-popup-close {
-    position: absolute;
+    position: fixed;
     left: 0;
-    top:0;
+    top:calc(4rem + 1px);
     color: rgb(114, 114, 114);
     font-size: 2.2rem;
     text-align: center;
@@ -320,6 +320,24 @@ input[type="radio"] + label:before {
     font-size: 1.8rem;
     font-weight: 300;
     font-family: "Roboto", sans-serif;
+}
+
+.warning {
+    color: #EE6055;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.warning-wrap {
+    margin-bottom: 10px;
+}
+
+.warning-input {
+    border: solid 1px #EE6055 !important;
+}
+.warning-input:focus {
+    border: solid 1px #EE6055 !important;
 }
 
 @media (max-width: 768px) {

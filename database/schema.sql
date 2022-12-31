@@ -1,10 +1,9 @@
--- SQLBook: Code
--- Active: 1671284697971@@127.0.0.1@3306@DiscountShare
 USE DiscountShare;
 
 DROP TABLE IF EXISTS review;
 DROP TABLE IF EXISTS price;
 DROP TABLE IF EXISTS discount;
+DROP TABLE IF EXISTS expired_review;
 DROP TABLE IF EXISTS expired_discount;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS administrator;
@@ -19,6 +18,7 @@ CREATE TABLE user (
     email VARCHAR(255) NOT NULL,
     hash CHAR(60) BINARY NOT NULL,
     tokens INT NOT NULL DEFAULT 0,
+    total_tokens INT NOT NULL DEFAULT 0,
     review_score INT NOT NULL DEFAULT 0,
     total_review_score INT NOT NULL DEFAULT 0
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -107,4 +107,13 @@ CREATE TABLE expired_discount (
     FOREIGN KEY (shop_id) REFERENCES shop(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (product_name) REFERENCES product(name) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE expired_review (
+    username VARCHAR(24) NOT NULL,
+    expired_discount_id INT NOT NULL,
+    rating ENUM("like", "dislike") NOT NULL,
+    PRIMARY KEY (username, expired_discount_id),
+    FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (expired_discount_id) REFERENCES expired_discount(discount_id) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

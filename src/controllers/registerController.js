@@ -1,6 +1,7 @@
 import { createJWT } from "../util/token.js";
 import { insertUser } from "../models/userModel.js";
 import { hashPassword } from "../util/pass.js";
+import { checkUsername, checkPassword } from "../util/userdetails.js";
 
 
 // const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
@@ -9,12 +10,9 @@ const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]
 
 async function registerController(req, res) {
     // validate username and password
-    if (req.body.username.length > 24 || req.body.username.length < 2) {
-        return res.status(400).json({error: "Invalid username length."});
-    }
-
-    if (!/^[A-Za-z0-9]+$/.test(req.body.username)) {
-        return res.status(400).json({error: "Invalid character in username."});
+    let username_check = checkUsername(req.body.username);
+    if (username_check !== true) {
+        return res.status(400).json({error: username_check})
     }
 
     if (!emailRegex.test(req.body.email)) {
@@ -25,20 +23,10 @@ async function registerController(req, res) {
     let buff = new Buffer.from(req.body.password_b64, "base64");
     let password = buff.toString("utf-8");
 
-    if (password.length < 8) {
-        return res.status(400).json({error: "Password must be 8 characters or longer."});
-    }
+    let password_check = checkPassword(password);
 
-    if (!/[A-Z]/.test(password)) {
-        return res.status(400).json({error: "Password must contain at least 1 uppercase letter."});
-    }
-
-    if (!/[0-9]/.test(password)) {
-        return res.status(400).json({error: "Password must contain at least 1 digit."});
-    }
-
-    if (!/[~`!@#\$%\^&\*\(\)-_\+=\[\]{}\|\\;:'",<>,\.\?\/]/.test(password)) {
-        return res.status(400).json({error: "Password must contain at least 1 symbol."});
+    if (password_check !== true) {
+        return res.status(400).json({error: password_check});
     }
 
     // hash password securely to store in database
@@ -49,7 +37,12 @@ async function registerController(req, res) {
         let token = createJWT(req.body.username);
         return res.status(200).json({session_token: token});  
     } catch (err) {
-        return res.status(409).json({error: "Username unavailable."});
+        if (err.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({error: "Username unavailable."});
+        }
+
+        console.log(err);
+        return res.status(500).json({error: "Internal server error."});
     }
 }
 

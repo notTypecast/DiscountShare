@@ -26,7 +26,8 @@ const EXPECTED_DATA_GET = {
     "shops": ["latitude", "longitude"],
     "categories": [],
     "discounts": ["shop_id"],
-    "products": [[1, "search_term", "category_id", "subcategory_id"]]
+    "products": [[1, "search_term", "category_id", "subcategory_id"]],
+    "user": ["history_type"]
 };
 
 const EXPECTED_DATA_PATCH = {
@@ -36,7 +37,7 @@ const EXPECTED_DATA_PATCH = {
     },
     "user": {
         "headers": [],
-        "body": ["new_username", "new_password_b64"]
+        "body": [[1, "new_username", "new_password_b64"]]
     }
 };
 

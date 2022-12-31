@@ -26,10 +26,11 @@ async function discountsControllerPost(req, res) {
         if (err.sqlState === "45000") {
             return res.status(403).json({error: err.sqlMessage});
         }
+        if (err.code === "ER_BAD_NULL_ERROR") {
+            return res.status(400).json({error: "Expected a value."})
+        }
 
-        console.log(err);
-
-        
+        console.log(err);        
     }
 
     return res.status(200).json(results);

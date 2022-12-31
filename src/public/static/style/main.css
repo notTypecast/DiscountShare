@@ -248,8 +248,14 @@ nav {
     margin-bottom: 7px;
 }
 
+.discount-banner-wrap {
+    max-height: 250px;
+    text-align: center;
+}
 .discount-banner {
     margin-bottom: 10px;
+    height: 100%;
+    width: auto;
 }
 
 .discount-date, .discount-user {
@@ -338,7 +344,7 @@ nav {
     text-align: center;
     font-size: 2rem;
     font-weight: 300;
-    margin-top: 15vh;
+    margin-top: 10vh;
     color: rgb(110, 110, 110);
 }
 
@@ -390,6 +396,7 @@ nav {
     align-items: center;
 }
 
+
 .discount-add-clear {
     text-decoration: underline;
     color: #056147;
@@ -425,6 +432,10 @@ nav {
     flex-direction: column;
     align-items: center;
     width: 80%;
+}
+
+.discount-add-form-inactive {
+    display: none;
 }
 
 .discount-categories-dropdown {
@@ -538,6 +549,8 @@ nav {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    border-top-right-radius: 50px;
+    border-top-left-radius: 50px;
 }
 
 .discount-add-search-results-wrap {
@@ -566,8 +579,15 @@ nav {
     background-color: rgb(241, 241, 241);
 }
 
+.discount-add-search-result-img-wrap {
+    display: flex;
+    width:60px;
+    height:60px;
+    justify-content: center;
+}
+
 .discount-add-search-result img {
-    width: 50px;
+    position: relative;
     margin-right: 7px;
 }
 
@@ -590,9 +610,10 @@ nav {
 }
 
 .discount-add-search-result-selected img {
-    width: 50px;
+    position: relative;
     margin-right: 7px;
 }
+
 
 
 
@@ -617,7 +638,7 @@ nav {
         justify-content: center;
         position: absolute;
         top: 0;
-        right: 0;
+        left: 0;
         height: 4rem;
         width: 4rem;
     }

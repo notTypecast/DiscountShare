@@ -5,7 +5,7 @@ import mysql from "mysql";
 import cors from "cors";
 import { requireAuth } from "./middleware/requireAuth.js";
 import { loggedIn } from "./middleware/loggedIn.js";
-import {getShops} from "./models/shopModel.js";
+import { getShops } from "./models/shopModel.js";
 import { updatePOIsFromFile } from "./models/poiModel.js";
 import { updateProductsFromFile } from "./models/productModel.js";
 import { updatePricesFromFile } from "./models/priceModel.js";
@@ -26,12 +26,13 @@ global.pool = mysql.createPool({
     await updatePOIsFromFile("data/POIs.json");
 })();
 
-import {registerRouter} from "./routes/register.js";
+import { registerRouter } from "./routes/register.js";
 import { loginRouter } from "./routes/login.js";
 import { shopsRouter } from "./routes/shops.js";
 import { categoriesRouter } from "./routes/categories.js"
 import { discountsRouter } from "./routes/discounts.js";
 import { productsRouter } from "./routes/products.js";
+import { userRouter } from "./routes/user.js";
 
 app.use(cors());
 app.use(cookieParser());
@@ -42,6 +43,7 @@ app.use("/api/", shopsRouter);
 app.use("/api/", categoriesRouter);
 app.use("/api/", discountsRouter);
 app.use("/api/", productsRouter);
+app.use("/api/", userRouter);
 
 app.get("/", requireAuth);
 app.get("/login", loggedIn);
