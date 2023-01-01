@@ -1,88 +1,246 @@
-const changeUsernameInput = document.getElementById("changeUsernameInput");
-const changeUsernameBtn = document.getElementById("changeUsernameBtn");
-const changePasswordInput = document.getElementById("changePasswordInput");
-const confirmPasswordInput = document.getElementById("confirmPasswordInput");
-const changePasswordBtn = document.getElementById("changePasswordBtn");
+const pageTitle = document.querySelector(".page-title");
+const logoutBtn = document.getElementById("logoutLink");
 
-let changeUsernameInjected = {
-    btn: changeUsernameBtn,
-    input: changeUsernameInput
+
+const userEndpoint = "/api/user";
+
+let onHold = ["page-section", "page-title"];
+
+let changeUsernameInjected = {};
+
+let changePasswordInjected = {};
+
+let routes = {
+    "My Account": accountRoute,
+    "Discount History": discountsRoute,
+    "Review History": reviewsRoute,
+    "Statistics": statisticsRoute
 };
+let activeLink = document.querySelector(".nav-link-active");
+accountRoute();
 
-let changePasswordInjected = {
-    btn: changePasswordBtn,
-    input: changePasswordInput
-};
-
-setWarningLocation(changeUsernameInjected.btn, changeUsernameInjected);
-
-changeUsernameInput.addEventListener("keyup", (e) => {
-    const text = e.target.value;
-
-    removeWarnings(e.target, changeUsernameInjected);
-
-    if (text.length == 0) {
-        return;
-    }
-
-    if (text.length < 2) {
-        addWarning(e.target, "Username should be longer than 1 character.", changeUsernameInjected);        
-    }
-
-    if (text.length > 24) {
-        addWarning(e.target, "Username should not be longer than 24 characters.", changeUsernameInjected);
-    }
-
-    if (!/^[A-Za-z0-9]+$/.test(text)) {
-        addWarning(e.target, "Username should only contain letters and digits.", changeUsernameInjected);
-    }
-});
-
-
-setWarningLocation(changePasswordInjected.btn, changePasswordInjected);
-
-changePasswordInput.addEventListener("keyup", (e) => {
-    const text = e.target.value;
-
-    removeWarnings(e.target, changePasswordInjected);
-
-    confirmPasswordEventListener();
-
-    if (text.length == 0) {
-        return;
-    }
-
-    if (text.length < 8) {
-        addWarning(e.target, "Password should be 8 characters or longer.", changePasswordInjected);
-    }
-
-    if (!/[A-Z]/.test(text)) {
-        addWarning(e.target, "Password must contain at least 1 uppercase letter.", changePasswordInjected);
-    }
-
-    if (!/[0-9]/.test(text)) {
-        addWarning(e.target, "Password must contain at least 1 digit.", changePasswordInjected);
-    }
-
-    if (!/[\~\`\!\@\#\$\%\^\&\*\(\)\-\_\+\=\[\]\{\}\|\\\;\:\'\"\,\<\>\,\.\?\/]/.test(text)) {
-        addWarning(e.target, "Password must contain at least 1 symbol.", changePasswordInjected);
-    }
-});
-
-function confirmPasswordEventListener() {
-    const text = confirmPasswordInput.value;
-
-    removeWarnings(confirmPasswordInput, changePasswordInjected);
-
-    if (text.length == 0) {
-        return;
-    }
-
-    password = changePasswordInput.value;
-
-    if (text !== password) {
-        addWarning(confirmPasswordInput, "Passwords do not match.", changePasswordInjected);
-    }
+for (let link of document.querySelectorAll(".nav-link")) {
+    link.addEventListener("click", matchRoute);
 }
 
-confirmPasswordInput.addEventListener("keyup", confirmPasswordEventListener);
+function matchRoute(e) {
+    let target = e.target;
+    if (target.tagName == "SPAN") {
+        target = target.parentElement;
+    }
+    let linkText = target.innerText;
+    if (linkText === activeLink.innerText) {
+        return;
+    }
+    activeLink.classList.remove("nav-link-active");
+    target.classList.add("nav-link-active");
+    activeLink = target;
+    mainView.clear();
+    routes[linkText]();
+}
+
+logoutBtn.addEventListener("click", logout);
+
+/*
+
+        <h1 class="page-title">My Account</h1>
+        <section class="page-section">
+            <h2 class="page-section-header">Change username</h2>
+            <form class="internal-form">
+                <input type="text" class="internal-form-input" id="changeUsernameInput" placeholder="Enter new username">
+                <button type="submit" class="internal-form-submit" id="changeUsernameBtn">Change</button>
+            </form>
+        </section>
+        <section class="page-section">
+            <h2 class="page-section-header">Change password</h2>
+            <form class="internal-form">
+                <input type="password" class="internal-form-input" id="changePasswordInput" placeholder="Enter new password">
+                <input type="password" class="internal-form-input" id="confirmPasswordInput" placeholder="Confirm new password">
+                <button type="submit" class="internal-form-submit" id="changePasswordBtn">Change</button>
+            </form>
+        </section>
+        */
+
+function accountRoute() {
+    mainView.setTitle("Welcome, " + getUsernameFromToken() + ".");
+
+    async function changeUsername(e) {
+        e.preventDefault();
+        let changeUsernameInput = e.target.parentNode.querySelector("#changeUsernameInput");
+        const username = changeUsernameInput.value;
+    
+        showLoader();
+        const response = await sameOriginPatchRequest(userEndpoint, {new_username: username});
+        let data = await response.json();
+        hideLoader();
+        if (response.status>=200 && response.status<300) {
+            makeToast("success", "Username changed successfully.", 3000);
+            mainView.setTitleDOM("Welcome, " + username + ".");
+            document.cookie = "session_token=" + data.session_token+"; SameSite=Lax";
+            changeUsernameInput.value = "";
+        } else {
+            makeToast("failure", data.error, 3000);
+        }
+    }
+    
+    async function changePassword(e) {
+        e.preventDefault();
+        let changePasswordInput = e.target.parentNode.querySelector("#changePasswordInput");
+        const password = changePasswordInput.value;
+        showLoader();
+        const response = await sameOriginPatchRequest(userEndpoint, {
+            "new_password_b64": window.btoa(password)
+        });
+        let data = await response.json();
+        hideLoader();
+        if (response.status>=200 && response.status<300) {
+            makeToast("success", "Password changed successfully.", 3000);
+            document.cookie = "session_token=" + data.session_token+"; SameSite=Lax";
+            changePasswordInput.value = "";
+            confirmPasswordInput.value = "";
+        } else {
+            makeToast("failure", data.error, 3000);
+        }
+    }
+    
+    let changeUsernameForm = document.createElement("form");
+    changeUsernameForm.classList.add("internal-form");
+
+    let changeUsernameInput = document.createElement("input");
+    changeUsernameInput.setAttribute("type", "text");
+    changeUsernameInput.setAttribute("id", "changeUsernameInput");
+    changeUsernameInput.setAttribute("placeholder", "Enter new username");
+    changeUsernameInput.classList.add("internal-form-input");
+    changeUsernameInput.addEventListener("keyup", (e) => {
+        const text = e.target.value;
+    
+        removeWarnings(e.target, changeUsernameInjected);
+    
+        if (text.length == 0) {
+            return;
+        }
+    
+        if (text.length < 2) {
+            addWarning(e.target, "Username should be longer than 1 character.", changeUsernameInjected);        
+        }
+    
+        if (text.length > 24) {
+            addWarning(e.target, "Username should not be longer than 24 characters.", changeUsernameInjected);
+        }
+    
+        if (!/^[A-Za-z0-9]+$/.test(text)) {
+            addWarning(e.target, "Username should only contain letters and digits.", changeUsernameInjected);
+        }
+    });
+
+    let changeUsernameBtn = document.createElement("button");
+    changeUsernameBtn.setAttribute("type", "submit");
+    changeUsernameBtn.setAttribute("id", "changeUsernameBtn");
+    changeUsernameBtn.classList.add("internal-form-submit");
+    changeUsernameBtn.innerHTML = "Change";
+    changeUsernameBtn.addEventListener("click", changeUsername);
+
+    changeUsernameForm.appendChild(changeUsernameInput);
+    changeUsernameForm.appendChild(changeUsernameBtn);
+
+    mainView.addSection("Change username", changeUsernameForm);
+
+    let changePasswordForm = document.createElement("form");
+    changePasswordForm.classList.add("internal-form");
+    
+    let changePasswordInput = document.createElement("input");
+    changePasswordInput.setAttribute("type", "password");
+    changePasswordInput.setAttribute("id", "changePasswordInput");
+    changePasswordInput.setAttribute("placeholder", "Enter new password");
+    changePasswordInput.classList.add("internal-form-input");
+
+
+    let confirmPasswordInput = document.createElement("input");
+    confirmPasswordInput.setAttribute("type", "password");
+    confirmPasswordInput.setAttribute("id", "confirmPasswordInput");
+    confirmPasswordInput.setAttribute("placeholder", "Confirm new password");
+    confirmPasswordInput.classList.add("internal-form-input");
+    confirmPasswordInput.addEventListener("keyup", confirmPasswordEventListener);
+
+    changePasswordInput.addEventListener("keyup", (e) => {
+        const text = e.target.value;
+    
+        removeWarnings(e.target, changePasswordInjected);
+    
+        confirmPasswordEventListener(confirmPasswordInput);
+    
+        if (text.length == 0) {
+            return;
+        }
+    
+        if (text.length < 8) {
+            addWarning(e.target, "Password should be 8 characters or longer.", changePasswordInjected);
+        }
+    
+        if (!/[A-Z]/.test(text)) {
+            addWarning(e.target, "Password must contain at least 1 uppercase letter.", changePasswordInjected);
+        }
+    
+        if (!/[0-9]/.test(text)) {
+            addWarning(e.target, "Password must contain at least 1 digit.", changePasswordInjected);
+        }
+    
+        if (!/[\~\`\!\@\#\$\%\^\&\*\(\)\-\_\+\=\[\]\{\}\|\\\;\:\'\"\,\<\>\,\.\?\/]/.test(text)) {
+            addWarning(e.target, "Password must contain at least 1 symbol.", changePasswordInjected);
+        }
+    });
+
+    function confirmPasswordEventListener(e) {
+        const text = confirmPasswordInput.value;
+    
+        removeWarnings(confirmPasswordInput, changePasswordInjected);
+    
+        if (text.length == 0) {
+            return;
+        }
+    
+        password = changePasswordInput.value;
+    
+        if (text !== password) {
+            addWarning(confirmPasswordInput, "Passwords do not match.", changePasswordInjected);
+        }
+    }
+
+    let changePasswordBtn = document.createElement("button");
+    changePasswordBtn.setAttribute("type", "submit");
+    changePasswordBtn.setAttribute("id", "changePasswordBtn");
+    changePasswordBtn.classList.add("internal-form-submit");
+    changePasswordBtn.innerHTML = "Change";
+    changePasswordBtn.addEventListener("click", changePassword);
+
+    changePasswordForm.appendChild(changePasswordInput);
+    changePasswordForm.appendChild(confirmPasswordInput);
+    changePasswordForm.appendChild(changePasswordBtn);
+
+    mainView.addSection("Change password", changePasswordForm);
+    
+    mainView.displaySections();
+
+    disableHold(onHold);
+
+    changeUsernameInjected.btn = changeUsernameBtn;
+    changeUsernameInjected.input = changeUsernameInput;
+
+    changePasswordInjected.btn = changePasswordBtn;
+    changePasswordInjected.input = changePasswordInput;
+
+    setWarningLocation(changeUsernameInjected.btn, changeUsernameInjected);
+    setWarningLocation(changePasswordInjected.btn, changePasswordInjected);
+}
+
+function discountsRoute() {
+
+}
+
+function reviewsRoute() {
+
+}
+
+function statisticsRoute() {
+    
+}

@@ -1,0 +1,151 @@
+nav {
+    position: fixed;
+    width: 20%;
+    height: 100%;
+    background-color: #0d1015;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.nav-logo {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    color: rgb(255, 255, 255);
+    font-size: 1.3rem;
+    padding-right: 8px;
+    padding-left: 8px;
+    position:relative;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    line-height: 4rem;
+    user-select: none;
+    width: 100%;
+}
+
+.nav-logo span {
+    color: #51A3A3;
+}
+
+.nav-links-wrap {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    width: 100%;
+    cursor: pointer;
+    display: inline-block;
+    user-select: none;
+    position: relative;
+    line-height: 1.2;
+    padding: 1.1rem 0;
+    font-size: 1.2rem;
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    color: white;
+    background-color: #0d1015;
+    transition: all .15s;
+}
+
+.nav-link span {
+    position: relative;
+    left: 0;
+    transition: all .15s;
+}
+
+.nav-link:hover span {
+    left: 4px;
+}
+
+.nav-link:hover {
+    color: #51A3A3;
+    box-shadow:inset 4px 0px #51A3A3;
+}
+
+.nav-link-active {
+    color: #51A3A3;
+    cursor: default;
+    box-shadow:inset 4px 0px #51A3A3;
+}
+
+.nav-link-active span {
+    left: 4px;
+}
+
+.logout-link {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    color: rgb(112, 112, 112);
+    font-size: 1.2rem;
+    line-height: 4rem;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.logout-link:hover {
+    color: #fff;
+}
+
+
+main {
+    width: 80%;
+    margin-left: 20%;
+    padding: 1rem;
+    min-height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 3rem;
+    font-weight: 300;
+    font-family: "Roboto", sans-serif;
+    color: #0d1015;
+    text-align: center;
+    width: 100%;
+    margin-top: 40px;
+    margin-bottom: 50px;
+    opacity: 0;
+}
+
+.not-on-hold {
+    opacity: 1 !important;
+    animation: elementEnterPage .15s;
+}
+
+.page-section {
+    width: 60%;
+    min-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+    opacity: 0;
+}
+
+@keyframes elementEnterPage {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-section-header {
+    font-family: "Roboto" ,sans-serif;
+    font-weight: 300;
+    font-size: 1.7rem;
+}

@@ -26,6 +26,8 @@ async function changeUserDetails(username, new_username, new_pwd) {
 
     await promiseQuery(query, args);
 
+    await promiseQuery("UPDATE user SET last_updated=(UNIX_TIMESTAMP()) WHERE username=?", username);
+
     return null;
 }
 
@@ -76,9 +78,15 @@ async function getUserReviewHistory(username) {
 }
 
 async function getUserScoreData(username) {
-    let results = await promiseQuery("SELECT tokens, total_tokens, review_score, (CASE WHEN total_review_score >= 0 THEN total_review_score ELSE 0 END) as total_review_score FROM user WHERE username=?", username);
+    let results = await promiseQuery("SELECT email, tokens, total_tokens, review_score, (CASE WHEN total_review_score >= 0 THEN total_review_score ELSE 0 END) as total_review_score FROM user WHERE username=?", username);
 
     return results[0];
 }
 
-export {insertUser, getUser, changeUserDetails, getUserDiscountHistory, getUserReviewHistory, getUserScoreData};
+async function getUserLastUpdated(username) {
+    let result = await promiseQuery("SELECT last_updated FROM user WHERE username=?", username);
+
+    return result[0].last_updated;
+}
+
+export {insertUser, getUser, changeUserDetails, getUserDiscountHistory, getUserReviewHistory, getUserScoreData, getUserLastUpdated};

@@ -305,3 +305,13 @@ function logout() {
     deleteAllCookies();
     window.location.href = "/login";
 }
+
+function readCookies() {
+    let cookies = document.cookie.split(";");
+    let cookieMap = {};
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim().split("=");
+        cookieMap[cookie[0]] = cookie[1];
+    }
+    return cookieMap;
+}

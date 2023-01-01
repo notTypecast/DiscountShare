@@ -5,6 +5,6 @@ import { userControllerGet, userControllerPatch } from "../controllers/userContr
 const router = express.Router();
 
 router.get("/user", requireAuth, generateMatchSchema("user", "get"), userControllerGet);
-router.post("/user", requireAuth, generateMatchSchema("user", "patch"), userControllerPatch);
+router.patch("/user", requireAuth, generateMatchSchema("user", "patch"), userControllerPatch);
 
 export {router as userRouter};

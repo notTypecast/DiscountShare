@@ -10,25 +10,27 @@
     <link rel="manifest" href="/static/img/favicon/site.webmanifest">
     <link href="/static/style/style.css" rel="stylesheet" type="text/css"/>
     <link href="/static/style/account.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/style/internal.css" rel="stylesheet" type="text/css"/>
     <script src="/static/js/lib.js" defer></script>
+    <script src="/static/js/internal.js" defer></script>
     <script src="/static/js/account.js" defer></script>
     <title>My Account - DiscountShare</title>
   </head>
   <body>
     <nav class="side-nav">
-        <a class="nav-logo">Discount<span>Share</span></a>
+        <a class="nav-logo" href="/">Discount<span>Share</span></a>
 
         <div class="nav-links-wrap">
-            <a class="nav-link" href="/account"><span>My Account</span></a>
-            <a class="nav-link" href="/account"><span>Discount History</span></a>
-            <a class="nav-link" href="/account"><span>Review History</span></a>
-            <a class="nav-link" href="/account"><span>Tokens</span></a>
+            <a class="nav-link nav-link-active"><span>My Account</span></a>
+            <a class="nav-link"><span>Discount History</span></a>
+            <a class="nav-link"><span>Review History</span></a>
+            <a class="nav-link"><span>Statistics</span></a>
         </div>
 
-        <a class="logout-link">Logout</a>
+        <a class="logout-link" id="logoutLink">Logout</a>
     </nav>
     <main>
-        <h1 class="page-title">My Account</h1>
+        <!-- <h1 class="page-title">My Account</h1>
         <section class="page-section">
             <h2 class="page-section-header">Change username</h2>
             <form class="internal-form">
@@ -43,14 +45,7 @@
                 <input type="password" class="internal-form-input" id="confirmPasswordInput" placeholder="Confirm new password">
                 <button type="submit" class="internal-form-submit" id="changePasswordBtn">Change</button>
             </form>
-        </section>
-        <section class="page-section">
-            <h2 class="page-section-header">Change username</h2>
-            <form class="internal-form">
-                <input type="text" class="internal-form-input" placeholder="Enter new username">
-                <button type="submit" class="internal-form-submit">Change</button>
-            </form>
-        </section>
+        </section> -->
     </main>
   </body>
 </html>

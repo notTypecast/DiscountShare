@@ -1,3 +1,4 @@
+import { createJWT } from "../util/token.js";
 import { changeUserDetails, getUserDiscountHistory, getUserReviewHistory, getUserScoreData } from "../models/userModel.js";
 import { hashPassword } from "../util/pass.js";
 import { checkUsername, checkPassword } from "../util/userdetails.js";
@@ -40,8 +41,6 @@ async function userControllerGet(req, res) {
 async function userControllerPatch(req, res) {
     let username = res.locals.user_data.username;
     let new_username = req.body.new_username;
-    let buff = new Buffer.from(req.body.new_password_b64, "base64");
-    let new_password = buff.toString("utf-8");
 
     if (new_username !== undefined) {
         let username_check = checkUsername(new_username);
@@ -50,14 +49,16 @@ async function userControllerPatch(req, res) {
         }
     }
 
-    if (new_password !== undefined) {
+    let hashedPassword;
+    if (req.body.new_password_b64 !== undefined) {
+        let buff = new Buffer.from(req.body.new_password_b64, "base64");
+        let new_password = buff.toString("utf-8");
         let password_check = checkPassword(new_password);
         if (password_check !== true) {
             return res.status(400).json({error: password_check});
         }
+        hashedPassword = await hashPassword(new_password);
     }
-
-    let hashedPassword = await hashPassword(password);
 
     try {
         await changeUserDetails(username, new_username, hashedPassword);
@@ -70,7 +71,8 @@ async function userControllerPatch(req, res) {
         return res.status(500).json({error: "Internal server error."});
     }
 
-    return res.status(200).end();
+    let token = createJWT(new_username === undefined ? username : new_username);
+    return res.status(200).json({session_token: token});
 }
 
 export {userControllerGet, userControllerPatch};
