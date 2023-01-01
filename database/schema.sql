@@ -17,10 +17,12 @@ CREATE TABLE user (
     username VARCHAR(24) PRIMARY KEY NOT NULL,
     email VARCHAR(255) NOT NULL,
     hash CHAR(60) BINARY NOT NULL,
+    last_updated BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP()),
     tokens INT NOT NULL DEFAULT 0,
     total_tokens INT NOT NULL DEFAULT 0,
     review_score INT NOT NULL DEFAULT 0,
-    total_review_score INT NOT NULL DEFAULT 0
+    total_review_score INT NOT NULL DEFAULT 0,
+    is_admin TINYINT(1) NOT NULL DEFAULT 0
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE administrator (
