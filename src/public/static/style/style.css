@@ -309,11 +309,13 @@ input[type="radio"] + label:before {
 .page-popup-header {
     position: relative;
     width: 80%;
-    line-height: 70px;
+    line-height: 1.8;
     margin: 0 auto;
     padding-left: 10px;
     text-align: center;
     padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 20px;
 }
 
 .page-popup-header h2 {
@@ -344,5 +346,12 @@ input[type="radio"] + label:before {
     .toast {
         width: 90%;
         left:5%;
+    }
+
+    .page-popup-header {
+        line-height: 1.5;
+    }
+    .page-popup-header h2 {
+        font-size: 1.5rem;
     }
 }

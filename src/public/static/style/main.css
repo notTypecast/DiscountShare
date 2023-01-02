@@ -664,6 +664,7 @@ nav {
         width: 90%;
         margin: 0 auto;
         left:5%;
+        min-width: 150px;
     }
 
     .popup-title {
@@ -672,6 +673,9 @@ nav {
 
     .discount-add-wrap {
         width: 90%;
+    }
+    .discount-banner {
+        max-width: 150px;
     }
 
 }

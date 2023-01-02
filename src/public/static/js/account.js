@@ -1,5 +1,15 @@
 const pageTitle = document.querySelector(".page-title");
 const logoutBtn = document.getElementById("logoutLink");
+const burgerMenu = document.querySelector(".nav-burger-menu");
+let mobileMenu = null;
+burgerMenu.addEventListener("click", toggleMobileMenu);
+
+function toggleMobileMenu() {
+     if (mobileMenu === null) {
+        mobileMenu = true;
+    }
+    document.querySelector("nav").classList.toggle("nav-active");
+}
 
 
 const userEndpoint = "/api/user";
@@ -23,7 +33,7 @@ for (let link of document.querySelectorAll(".nav-link")) {
     link.addEventListener("click", matchRoute);
 }
 
-function matchRoute(e) {
+async function matchRoute(e) {
     let target = e.target;
     if (target.tagName == "SPAN") {
         target = target.parentElement;
@@ -36,7 +46,10 @@ function matchRoute(e) {
     target.classList.add("nav-link-active");
     activeLink = target;
     mainView.clear();
-    routes[linkText]();
+    await routes[linkText]();
+    if (mobileMenu) {
+        toggleMobileMenu();
+    }
 }
 
 logoutBtn.addEventListener("click", logout);
@@ -61,7 +74,7 @@ logoutBtn.addEventListener("click", logout);
         </section>
         */
 
-function accountRoute() {
+async function accountRoute() {
     mainView.setTitle("Welcome, " + getUsernameFromToken() + ".");
 
     async function changeUsername(e) {
@@ -233,14 +246,84 @@ function accountRoute() {
     setWarningLocation(changePasswordInjected.btn, changePasswordInjected);
 }
 
-function discountsRoute() {
+async function discountsRoute() {
+    mainView.setTitle("Discount History");
 
+    showLoader();
+    let response = await sameOriginGetRequest(userEndpoint, {
+        "history_type": "discounts"
+    });
+    let data = await response.json();
+    hideLoader();
+    
+    if (!(response.status>=200 && response.status<300)) {
+        makeToast("failure", data.error, 3000);
+        return;
+    }
+
+    if (data.length > 0) {
+        let discountsTable = new TableCreator(["Product name", "Shop", "Price", "Submission Date", "Expiry Date", "Time", "Likes", "Dislikes", "Active"]);
+        
+        for (let row of data) {
+            let pDate = new Date(row.posted);
+            discountsTable.appendRow([row.product_name, row.name === null ? row.shop_id : row.name, row.cost + "€", pDate.toLocaleDateString(), new Date(row.expiry).toLocaleDateString(), pDate.toLocaleTimeString(), row.likes, row.dislikes, row.expired ? "No" : "Yes"]);
+        }
+        
+        
+        mainView.addSection(null, discountsTable.getTable(), ["table-page-section"]);
+    } else {
+        let p = document.createElement("p");
+        p.innerHTML = "No discount history found.";
+        p.classList.add("no-results");
+        mainView.addSection(null, p);
+    }
+
+    mainView.displaySections();
+
+    disableHold(onHold);
 }
 
-function reviewsRoute() {
+async function reviewsRoute() {
+    mainView.setTitle("Review History");
 
+    showLoader();
+    let response = await sameOriginGetRequest(userEndpoint, {
+        "history_type": "reviews"
+    });
+    let data = await response.json();
+    hideLoader();
+    
+    if (!(response.status>=200 && response.status<300)) {
+        makeToast("failure", data.error, 3000);
+        return;
+    }
+
+    if (data.length > 0) {
+        let discountsTable = new TableCreator(["Product name", "Shop", "Price", "Rating", "Submitted by", "Submission Date", "Expiry Date", "Time", "Active"]);
+        
+        for (let row of data) {
+            let pDate = new Date(row.posted);
+            let ratingIcon = document.createElement("span");
+            ratingIcon.classList.add("material-icons");
+            ratingIcon.innerText = row.rating === "like" ? "thumb_up" : "thumb_down";
+
+            discountsTable.appendRow([row.product_name, row.name === null ? row.shop_id : row.name, row.cost + "€", ratingIcon, row.username, pDate.toLocaleDateString(), new Date(row.expiry).toLocaleDateString(), pDate.toLocaleTimeString(), row.expired ? "No" : "Yes"]);
+        }
+        
+        
+        mainView.addSection(null, discountsTable.getTable(), ["table-page-section"]);
+    } else {
+        let p = document.createElement("p");
+        p.innerHTML = "No review history found.";
+        p.classList.add("no-results");
+        mainView.addSection(null, p);
+    }
+
+    mainView.displaySections();
+
+    disableHold(onHold);
 }
 
-function statisticsRoute() {
+async function statisticsRoute() {
     
 }

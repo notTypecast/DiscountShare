@@ -27,13 +27,22 @@ class MainViewFactory {
         this.title = newTitle;
     }
     
-    addSection(sectionTitle, sectionContent) {
+    addSection(sectionTitle, sectionContent, overrideClasses) {
         let section = document.createElement("section");
         section.classList.add("page-section");
-        let sectionTitleElement = document.createElement("h2");
-        sectionTitleElement.classList.add("page-section-header");
-        sectionTitleElement.innerText = sectionTitle;
-        section.appendChild(sectionTitleElement);
+        if (this.title !== null) {
+            let sectionTitleElement = document.createElement("h2");
+            sectionTitleElement.classList.add("page-section-header");
+            sectionTitleElement.innerText = sectionTitle;
+            section.appendChild(sectionTitleElement);
+        }
+
+        if (overrideClasses) {
+            for (let overrideClass of overrideClasses) {
+                section.classList.add(overrideClass);
+            }
+        }
+
         section.appendChild(sectionContent);
 
         this.sections.push(section);
@@ -69,3 +78,45 @@ class MainViewFactory {
 
 
 const mainView = new MainViewFactory(document.querySelector("main"));
+
+class TableCreator {
+    constructor(cols) {
+        this.cols = cols;
+        this.tableWrap = document.createElement("div");
+        this.tableWrap.classList.add("data-table-wrap");
+        this.tableRoot = document.createElement("table");
+        this.tableRoot.classList.add("data-table");
+
+        let headerRow = document.createElement("tr");
+        this.cols.forEach(col => {
+            let newHeader = document.createElement("th");
+            newHeader.innerHTML = col;
+            headerRow.appendChild(newHeader);
+        });
+
+        this.tableRoot.appendChild(headerRow);
+        this.tableWrap.appendChild(this.tableRoot);
+    }
+
+    getTable() {   
+        return this.tableWrap;
+    }
+
+    appendRow(row) {
+        let newtr = document.createElement("tr");
+        row.forEach(cell => {
+            let newtd = document.createElement("td");
+            if (cell === null) {
+                cell = `NA`;
+            } 
+            
+            if (cell instanceof HTMLElement) {
+                newtd.appendChild(cell);
+            } else {
+                newtd.innerHTML = cell;
+            }
+            newtr.appendChild(newtd);
+        });
+        this.tableRoot.appendChild(newtr);
+    }
+}

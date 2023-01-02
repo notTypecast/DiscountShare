@@ -8,6 +8,10 @@ nav {
     justify-content: space-between;
 }
 
+.nav-burger-menu {
+    display: none;
+}
+
 .nav-logo {
     font-family: "Poppins", sans-serif;
     font-weight: 400;
@@ -144,8 +148,146 @@ main {
     }
 }
 
+
+
+
 .page-section-header {
     font-family: "Roboto" ,sans-serif;
     font-weight: 300;
     font-size: 1.7rem;
+}
+
+.table-page-section {
+    width: 100%;
+}
+
+.data-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+    margin-bottom: 200px;
+}
+
+.data-table {
+    position: relative;
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    overflow-y: visible;
+    overflow-x: auto;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.data-table th, .data-table td {
+    line-height: 1.2;
+    font-family: "Roboto", sans-serif;
+    padding-top: 14px;;
+    padding-bottom: 14px;;
+    font-size: 1rem;
+}
+
+.data-table th {
+    background-color: #0d1015;
+    color: white;
+}
+
+.data-table td {
+    visibility: visible;
+    color: #000;
+    margin-top: 14px;
+    position: relative;
+    min-width: 150px;
+    padding-left: 8px;;
+    padding-right: 8px;;
+    max-width: 200px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.data-table tr {
+    background-color: #fff;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: rgb(250, 250, 250);
+}
+
+.no-results {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 300;
+    margin-top: 10vh;
+    color: rgb(110, 110, 110);
+}
+
+
+@media (max-width: 768px) {
+    nav {
+        position: fixed;
+        width: 100%;
+        height: 100vh;
+        left:0;
+        top:0;
+        z-index: 100;
+        overflow-y: hidden;
+        height: 4rem;
+    }
+
+    .nav-active {
+        height: 100vh;
+    }
+
+    .nav-link {
+        min-height: min-content;
+    }
+    .nav-burger-menu {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 4rem;
+        width: 4rem;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .nav-logo {
+        width: auto;
+        line-height: 4rem;
+        margin:0 auto;
+    }
+
+    main {
+        width: 100%;
+        margin-left: 0;
+        padding: 0;
+        padding-bottom: 20px;
+    }
+
+    .page-section {
+        width: 90%;
+        min-width: 200px;
+    }
+
+    .page-title {
+        font-size: 2.1rem;
+        margin-top: 6rem;
+    }
+
+    .internal-form {
+        width: 100%;
+    }
+
+    .data-table td {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        max-width: 50px;
+    }
+
 }
