@@ -23,7 +23,7 @@ async function loginController(req, res) {
         return res.status(403).json({error: "Invalid credentials."});
     }
 
-    let token = createJWT(results[0].username);
+    let token = createJWT(results[0].username, results[0].is_admin);
     return res.status(200).json({session_token: token});
 }
 

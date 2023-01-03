@@ -3,9 +3,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import mysql from "mysql";
 import cors from "cors";
-import { requireAuth } from "./middleware/requireAuth.js";
+import { requireAuth, requireAdmin } from "./middleware/requireAuth.js";
 import { loggedIn } from "./middleware/loggedIn.js";
-import { getShops } from "./models/shopModel.js";
 import { updatePOIsFromFile } from "./models/poiModel.js";
 import { updateProductsFromFile } from "./models/productModel.js";
 import { updatePricesFromFile } from "./models/priceModel.js";
@@ -33,10 +32,11 @@ import { categoriesRouter } from "./routes/categories.js"
 import { discountsRouter } from "./routes/discounts.js";
 import { productsRouter } from "./routes/products.js";
 import { userRouter } from "./routes/user.js";
+import { adminRouter } from "./routes/admin.js";
 
 app.use(cors());
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 app.use("/api/", registerRouter);
 app.use("/api/", loginRouter);
 app.use("/api/", shopsRouter);
@@ -44,9 +44,12 @@ app.use("/api/", categoriesRouter);
 app.use("/api/", discountsRouter);
 app.use("/api/", productsRouter);
 app.use("/api/", userRouter);
+app.use("/api/", adminRouter);
 
 app.get("/", requireAuth);
+app.get("/account", requireAuth);
 app.get("/login", loggedIn);
+app.get("/admin", requireAdmin);
 app.use(express.static("src/public", {index: "main.html", extensions: ["html"]}));
 
 

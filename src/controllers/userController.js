@@ -60,8 +60,10 @@ async function userControllerPatch(req, res) {
         hashedPassword = await hashPassword(new_password);
     }
 
+    let is_admin;
+
     try {
-        await changeUserDetails(username, new_username, hashedPassword);
+        is_admin = await changeUserDetails(username, new_username, hashedPassword);
     } catch (err) {
         if (err.code === "ER_DUP_ENTRY") {
             return res.status(409).json({error: "Username unavailable."});
@@ -71,7 +73,7 @@ async function userControllerPatch(req, res) {
         return res.status(500).json({error: "Internal server error."});
     }
 
-    let token = createJWT(new_username === undefined ? username : new_username);
+    let token = createJWT(new_username === undefined ? username : new_username, is_admin);
     return res.status(200).json({session_token: token});
 }
 

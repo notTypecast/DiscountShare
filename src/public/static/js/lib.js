@@ -143,21 +143,66 @@ function removeWarnings(inputNode, injected) {
     }
 }
 
-async function sameOriginPostRequest(endpoint, body) {
+function buildParamString(params) {
+    const keys = Object.keys(params);
+    let queryString = "?";
+    if (keys.length !== 0) {
+        for (let param of keys) {
+            if (params[param] !== undefined) {
+                queryString += `${param}=${params[param]}&`;
+            }
+        }
+    }
+    queryString = queryString.substring(0, queryString.length - 1);
+
+    return queryString;
+}
+
+async function sameOriginPostRequest(endpoint, body, files) {
     try {
-        const response = await fetch(rootURL + endpoint, {
+
+        let postBody = JSON.stringify(body);
+        if (files !== undefined) {
+            const formData = new FormData();
+            for (let file of files) {
+                formData.append("files", file);
+            }
+            for (let key of Object.keys(body)) {
+                formData.append(key, body[key]);
+            }
+            postBody = formData;
+        }
+
+        let fetchBody = {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body),
+            body: postBody,
             redirect: "manual"
-        });
+
+        }
+        if (files === undefined) {
+            fetchBody.headers = {
+                "Content-Type": "application/json"
+            };
+        }
+        const response = await fetch(rootURL + endpoint, fetchBody);
         return response;
     } catch (err) {
         console.log(err);
         return err;
     }
+}
+
+async function sameOriginDeleteRequest(endpoint, params) {
+    try {
+        const queryString = buildParamString(params);
+        const response = await fetch(rootURL + endpoint + queryString, {
+            method: "DELETE"
+        });
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err;
+    } 
 }
 
 async function sameOriginPatchRequest(endpoint, body) {
@@ -178,22 +223,8 @@ async function sameOriginPatchRequest(endpoint, body) {
 
 async function sameOriginGetRequest(endpoint, params) {
     try {
-        const keys = Object.keys(params);
-        let queryString = "?";
-        let total_keys = 0;
-        if (keys.length !== 0) {
-            for (let param of keys) {
-                if (params[param] !== undefined) {
-                    ++total_keys;
-                    queryString += `${param}=${params[param]}&`;
-                }
-            }
-            if (total_keys !== 0) {
-                queryString = queryString.substring(0, queryString.length - 1);
-            }
-        }
-
-        const response = await fetch(rootURL + endpoint + (total_keys === 0 ? "" : queryString));
+        const queryString = buildParamString(params);
+        const response = await fetch(rootURL + endpoint + queryString);
 
         return response;
     } catch (err) {

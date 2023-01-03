@@ -37,7 +37,12 @@ async function getProducts(search_term, category_id, subcategory_id) {
 
 async function updateProductsFromFile(filepath) {
     let data = await fs.readFile(filepath);
-    const jsonData = JSON.parse(data);
+    let jsonData;
+    try {
+        jsonData = JSON.parse(data);
+    } catch (err) {
+        return null;
+    }
     
     const categories_sql = "INSERT INTO category(id, name) VALUES ? ON DUPLICATE KEY UPDATE name = VALUES(name)";
     const category_data = jsonData.categories.map(category => [category.uuid, category.name]);

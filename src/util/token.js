@@ -4,9 +4,10 @@ dotenv.config()
 
 const secret = process.env.JWT_SECRET;
 
-function createJWT(username) {
+function createJWT(username, is_admin) {
     let token = jwt.sign({
-        username: username
+        username: username,
+        is_admin: is_admin
     }, secret, {
         expiresIn: "6h"
     });

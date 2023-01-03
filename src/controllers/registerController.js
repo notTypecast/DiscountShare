@@ -34,7 +34,7 @@ async function registerController(req, res) {
 
     try {
         await insertUser(req.body.username, hashedPassword, req.body.email);
-        let token = createJWT(req.body.username);
+        let token = createJWT(req.body.username, false);
         return res.status(200).json({session_token: token});  
     } catch (err) {
         if (err.code === "ER_DUP_ENTRY") {

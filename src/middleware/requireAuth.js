@@ -26,4 +26,26 @@ async function requireAuth(req, res, next) {
     next();
 }
 
-export {requireAuth};
+async function requireAdmin(req, res, next) {
+    let token = req.cookies.session_token;
+    try {
+        if (token === undefined) {
+            throw "No token found.";
+        }
+        let decoded = jwt.verify(token, secret);
+        if (!decoded.is_admin) {
+            return res.status(403).redirect("/");
+        }
+        let last_updated_timestamp = await getUserLastUpdated(decoded.username);
+        if (last_updated_timestamp > Math.floor(Date.now() / 1000)) {
+            throw "Token is invalidated.";
+        }
+        res.locals.user_data = decoded;
+    } catch (err) {
+        res.clearCookie("session_token")
+        return res.status(403).redirect("/login");
+    }
+    next();
+}
+
+export {requireAuth, requireAdmin};

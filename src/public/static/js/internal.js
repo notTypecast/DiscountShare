@@ -120,3 +120,42 @@ class TableCreator {
         this.tableRoot.appendChild(newtr);
     }
 }
+
+function createUploadForm(inputId, submitEvent) {
+
+    let fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "text/*";
+    fileInput.id = inputId;
+
+    let fileLabel = document.createElement("label");
+    fileLabel.innerText = "Browse...";
+    fileLabel.classList.add("internal-form-file-label");
+    fileLabel.htmlFor = inputId;
+
+    let fileLabelIcon = document.createElement("span");
+    fileLabelIcon.classList.add("material-icons");
+    fileLabelIcon.innerText = "attach_file";
+    fileLabel.prepend(fileLabelIcon);
+
+    let selectedFile = document.createElement("span");
+    selectedFile.classList.add("internal-form-file-selected");
+    selectedFile.innerText = "No file selected";
+
+    fileInput.addEventListener("change", () => {
+        selectedFile.innerText = fileInput.files[0].name;
+    });
+
+    let fileInputForm = document.createElement("form");
+    fileInputForm.classList.add("internal-form");
+    fileInputForm.appendChild(fileLabel);
+    fileInputForm.appendChild(selectedFile);
+    fileInputForm.appendChild(fileInput);
+    let fileInputSubmit = document.createElement("button");
+    fileInputSubmit.innerText = "Upload";
+    fileInputSubmit.classList.add("internal-form-submit");
+    fileInputSubmit.addEventListener("click",submitEvent);
+    fileInputForm.appendChild(fileInputSubmit);
+
+    return fileInputForm;
+}

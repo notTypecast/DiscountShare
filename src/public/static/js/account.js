@@ -325,5 +325,39 @@ async function reviewsRoute() {
 }
 
 async function statisticsRoute() {
-    
+    mainView.setTitle("Statistics");
+    showLoader();
+    let response = await sameOriginGetRequest(userEndpoint, {
+        "history_type": "score_data"
+    });
+    let data = await response.json();
+    hideLoader();
+    if (!(response.status>=200 && response.status<300)) {
+        makeToast("failure", data.error, 3000);
+        return;
+    }
+
+    let reviewScore = document.createElement("p");
+    reviewScore.classList.add("score-text");
+    reviewScore.innerHTML = data.review_score;
+    mainView.addSection("Review score (month)", reviewScore);
+
+    let reviewScoreTotal = document.createElement("p");
+    reviewScoreTotal.classList.add("score-text");
+    reviewScoreTotal.innerHTML = data.total_review_score;
+    mainView.addSection("Total review score", reviewScoreTotal);
+
+    let tokens = document.createElement("p");
+    tokens.classList.add("tokens-text");
+    tokens.innerHTML = data.tokens;
+    mainView.addSection("Tokens (month)", tokens);
+
+    let tokensTotal = document.createElement("p");
+    tokensTotal.classList.add("tokens-text");
+    tokensTotal.innerHTML = data.total_tokens;
+    mainView.addSection("Total tokens", tokensTotal);
+
+    mainView.displaySections();
+
+    disableHold(onHold);
 }

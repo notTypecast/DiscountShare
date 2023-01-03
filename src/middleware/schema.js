@@ -1,49 +1,65 @@
 /*
 * Middleware for ensuring a request has the correct format
-* For GET requests, GET format object contains a list of expected parameters
-* For other requests, request format objects contain a list of expected headers, as well as another list of required body values
-* If inside a JSONArray, there is another JSONArray of values, it means that:
+* Request format objects contain the keys that should exist in the request, with the value being a JSONArray containing each expected parameter
+* If inside the JSONArray, there is another JSONArray of values, it means that:
 * --> If the first value is 0, exactly one of the following values is required
 * --> If the first value is 1, at least one of the following values if required
 */
-// TODO either remove headers completely or, if ever used, add ability for nested array
-const EXPECTED_DATA_POST = {
-    "register": {
-        "headers": [],
-        "body": ["username", "password_b64", "email"]
+
+const EXPECTED_DATA_GET = {
+    "shops": {
+        "query": ["latitude", "longitude"]
     },
-    "login": {
-        "headers": [],
-        "body": ["username", "password_b64"]
+    "categories": {
+        "query": []
     },
     "discounts": {
-        "headers": [],
-        "body": ["shop_id", "product_name", "cost"]
+        "query": ["shop_id"]
+    },
+    "products": {
+        "query": [[1, "search_term", "category_id", "subcategory_id"]]
+    },
+    "user": {
+        "query": ["history_type"]
     }
 };
 
-const EXPECTED_DATA_GET = {
-    "shops": ["latitude", "longitude"],
-    "categories": [],
-    "discounts": ["shop_id"],
-    "products": [[1, "search_term", "category_id", "subcategory_id"]],
-    "user": ["history_type"]
+const EXPECTED_DATA_POST = {
+    "register": {
+        "body": ["username", "password_b64", "email"]
+    },
+    "login": {
+        "body": ["username", "password_b64"]
+    },
+    "discounts": {
+        "body": ["shop_id", "product_name", "cost"]
+    },
+    "admin": {
+        "files": [],
+        "body": ["type"]
+    }
 };
 
 const EXPECTED_DATA_PATCH = {
     "discounts": {
-        "headers": [],
         "body": [[0, "in_stock", "rating"], "shop_id", "product_name", "latitude", "longitude"]
     },
     "user": {
-        "headers": [],
         "body": [[1, "new_username", "new_password_b64"]]
     }
 };
 
+const EXPECTED_DATA_DELETE = {
+    "admin": {
+        "query": ["type"]
+    }
+}
+
 const REQ_MATCH = {
+    "get": EXPECTED_DATA_GET,
     "post": EXPECTED_DATA_POST,
-    "patch": EXPECTED_DATA_PATCH
+    "patch": EXPECTED_DATA_PATCH,
+    "delete": EXPECTED_DATA_DELETE
 };
 
 function matchNestedArray(param_obj, arr) {
@@ -60,46 +76,28 @@ function matchNestedArray(param_obj, arr) {
 }
 
 function matchSchema(obj, req_type, endpoint) {
-    if (req_type === "get") {
-        const endpoint_data = EXPECTED_DATA_GET[endpoint];
-        if (endpoint_data === undefined) {
-            return false;
-        }
-
-        for (let parameter of endpoint_data) {
-            if (Array.isArray(parameter)) {
-                if (!matchNestedArray(obj.query, parameter)) {
-                    return false;
-                }
-            }
-            else if (obj.query[parameter] === undefined) {
-                return false;
-            }
-        }
+    const endpoint_data = REQ_MATCH[req_type][endpoint];
+    if (endpoint_data === undefined) {
+        return false;
     }
-    else {
-        const endpoint_data = REQ_MATCH[req_type][endpoint];
-        if (endpoint_data === undefined) {
+
+    for (let paramObjKey in endpoint_data) {
+        if (obj[paramObjKey] === undefined) {
             return false;
         }
-        
-        for (let header of endpoint_data.headers) {
-            if (obj.headers[header] === undefined) {
-                return false;
-            }
-        }
 
-        for (let key of endpoint_data.body) {
+        for (let key of endpoint_data[paramObjKey]) {
             // if key is option array
             if (Array.isArray(key)) {
-                if (!matchNestedArray(obj.body, key)) {
+                if (!matchNestedArray(obj[paramObjKey], key)) {
                     return false;
                 }
             }
-            else if (obj.body[key] === undefined) {
+            else if (obj[paramObjKey][key] === undefined) {
                 return false;
             }
         }
+
     }
 
     return true;

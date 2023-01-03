@@ -4,7 +4,7 @@ async function changeUserDetails(username, new_username, new_pwd) {
     let u = new_username !== undefined;
     let p = new_pwd !== undefined;
     
-    let query = "UPDATE user SET ";
+    let query = "UPDATE user SET last_updated=(UNIX_TIMESTAMP()) AND ";
     let args = [];
 
     if (u) {
@@ -26,9 +26,9 @@ async function changeUserDetails(username, new_username, new_pwd) {
 
     await promiseQuery(query, args);
 
-    await promiseQuery("UPDATE user SET last_updated=(UNIX_TIMESTAMP()) WHERE username=?", username);
+    let result = await promiseQuery("SELECT is_admin FROM user WHERE username=?", u ? new_username : username);
 
-    return null;
+    return result[0].is_admin;
 }
 
 async function insertUser(username, pwd, email) {
