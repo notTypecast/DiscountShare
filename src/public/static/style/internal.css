@@ -309,6 +309,19 @@ main {
     color: rgb(110, 110, 110);
 }
 
+.internal-dropdown {
+    background-color: #fff;
+    color:rgb(95, 95, 95);
+    font-family: "Roboto", sans-serif;
+    font-size: 1rem;
+    border: none;
+    width: 80%;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    margin: 7px 10px;
+}
+
 
 @media (max-width: 768px) {
     nav {

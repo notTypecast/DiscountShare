@@ -1,5 +1,9 @@
 const rootURL = "http://localhost:3000";
 
+// January is 0
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
 // create loader
 const loader = document.createElement("div");
 let loaderVisible = false;
@@ -346,3 +350,20 @@ function readCookies() {
     }
     return cookieMap;
 }
+
+function getPropertyFromToken(property) {
+    const token = readCookies()["session_token"];
+    const payload = token.split(".")[1];
+    const decodedPayload = atob(payload);
+    const result = JSON.parse(decodedPayload)[property];
+
+    return result;
+}
+
+function isLeapYear(year) {
+    if (year % 4 !== 0) return false;
+    if (year % 100 !== 0) return true;
+    if (year % 400 !== 0) return false;
+    return true;
+  }
+  

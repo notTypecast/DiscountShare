@@ -256,6 +256,7 @@ nav {
     margin-bottom: 10px;
     height: 100%;
     width: auto;
+    max-width: 100%;
 }
 
 .discount-date, .discount-user {

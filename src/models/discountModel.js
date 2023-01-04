@@ -20,13 +20,14 @@ async function getDiscounts(shop_id, username) {
         FROM price INNER JOIN (
             SELECT product_name, MAX(day_date) AS max_date
             FROM price
+            WHERE day_date <> CURDATE()
             GROUP BY product_name
         ) latest_price ON price.product_name=latest_price.product_name AND price.day_date=latest_price.max_date
     ) price ON discount.product_name=price.product_name
     LEFT JOIN (
         SELECT price.product_name, AVG(price.cost) AS avg_cost
         FROM price
-        WHERE price.day_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        WHERE price.day_date >= DATE_SUB(CURDATE(), INTERVAL 8 DAY) AND price.day_date <> CURDATE()
         GROUP BY price.product_name
     ) avg_price ON discount.product_name=avg_price.product_name
     INNER JOIN product ON discount.product_name=product.name

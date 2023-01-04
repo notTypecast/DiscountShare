@@ -8,14 +8,6 @@ function disableHold(onHold) {
     }
 }
 
-function getUsernameFromToken() {
-    const token = readCookies()["session_token"];
-    const payload = token.split(".")[1];
-    const decodedPayload = atob(payload);
-    const username = JSON.parse(decodedPayload).username;
-
-    return username;
-}
 
 class MainViewFactory {
     constructor(parentNode) {
@@ -103,9 +95,9 @@ class TableCreator {
     }
 
     appendRow(row) {
-        let newtr = document.createElement("tr");
+        const newtr = document.createElement("tr");
         row.forEach(cell => {
-            let newtd = document.createElement("td");
+            const newtd = document.createElement("td");
             if (cell === null) {
                 cell = `NA`;
             } 
@@ -123,22 +115,22 @@ class TableCreator {
 
 function createUploadForm(inputId, submitEvent) {
 
-    let fileInput = document.createElement("input");
+    const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = "text/*";
     fileInput.id = inputId;
 
-    let fileLabel = document.createElement("label");
+    const fileLabel = document.createElement("label");
     fileLabel.innerText = "Browse...";
     fileLabel.classList.add("internal-form-file-label");
     fileLabel.htmlFor = inputId;
 
-    let fileLabelIcon = document.createElement("span");
+    const fileLabelIcon = document.createElement("span");
     fileLabelIcon.classList.add("material-icons");
     fileLabelIcon.innerText = "attach_file";
     fileLabel.prepend(fileLabelIcon);
 
-    let selectedFile = document.createElement("span");
+    const selectedFile = document.createElement("span");
     selectedFile.classList.add("internal-form-file-selected");
     selectedFile.innerText = "No file selected";
 
@@ -146,16 +138,46 @@ function createUploadForm(inputId, submitEvent) {
         selectedFile.innerText = fileInput.files[0].name;
     });
 
-    let fileInputForm = document.createElement("form");
+    const fileInputForm = document.createElement("form");
     fileInputForm.classList.add("internal-form");
     fileInputForm.appendChild(fileLabel);
     fileInputForm.appendChild(selectedFile);
     fileInputForm.appendChild(fileInput);
-    let fileInputSubmit = document.createElement("button");
+
+    const fileInputSubmit = document.createElement("button");
     fileInputSubmit.innerText = "Upload";
     fileInputSubmit.classList.add("internal-form-submit");
     fileInputSubmit.addEventListener("click",submitEvent);
     fileInputForm.appendChild(fileInputSubmit);
 
     return fileInputForm;
+}
+
+function createDeleteButton(type, confirmMsg, successMsg) {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("delete-all-btn");
+    deleteBtn.innerText = "Delete";
+    deleteBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const confirmation = confirm(confirmMsg);
+        if (confirmation) {
+            showLoader();
+            const response = await sameOriginDeleteRequest(adminEndpoint, {
+                "type": type
+            });
+            hideLoader();
+            if (response.status>=200 && response.status<300) {
+                makeToast("success", successMsg, 3000);
+            } else {
+                const data = await response.json();
+                makeToast("failure", data.error, 3000);
+            }
+        }
+    });
+    const deleteIcon = document.createElement("span");
+    deleteIcon.classList.add("material-icons");
+    deleteIcon.innerText = "delete";
+    deleteBtn.prepend(deleteIcon);
+
+    return deleteBtn;
 }

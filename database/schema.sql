@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS discount;
 DROP TABLE IF EXISTS expired_review;
 DROP TABLE IF EXISTS expired_discount;
 DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS administrator;
 DROP TABLE IF EXISTS shop;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS subcategory;
@@ -23,12 +22,6 @@ CREATE TABLE user (
     review_score INT NOT NULL DEFAULT 0,
     total_review_score INT NOT NULL DEFAULT 0,
     is_admin TINYINT(1) NOT NULL DEFAULT 0
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE administrator (
-    username VARCHAR(24) PRIMARY KEY NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    hash CHAR(60) BINARY NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE shop (

@@ -75,7 +75,7 @@ logoutBtn.addEventListener("click", logout);
         */
 
 async function accountRoute() {
-    mainView.setTitle("Welcome, " + getUsernameFromToken() + ".");
+    mainView.setTitle("Welcome, " + getPropertyFromToken("username") + ".");
 
     async function changeUsername(e) {
         e.preventDefault();

@@ -3,6 +3,7 @@ const categoriesEndpoint = "/api/categories";
 const discountsEndpoint = "/api/discounts";
 const productsEndpoint = "/api/products";
 const logoutBtn = document.getElementById("logoutBtn");
+const adminBtn = document.getElementById("adminBtn");
 const filterHeader = document.getElementById("filtersHeader");
 const burgerMenu = document.querySelector(".nav-burger-menu");
 let selectedFilter = null;
@@ -17,6 +18,11 @@ const categoriesSelectDefault = "Select a category";
 const subcategoriesSelectDefault = "Select a subcategory";
 const productsSelectDefault = "Select a product";
 const searchDefault = "Search for a product";
+
+const is_admin = getPropertyFromToken("is_admin");
+if (!is_admin) {
+    adminBtn.style.display = "none";
+}
 
 filterHeader.addEventListener("click", (e) => {
     document.querySelector(".filters-wrap").classList.toggle("filters-active");;
@@ -898,14 +904,14 @@ function populateSearchResults(products) {
 }
 
 async function addDiscount(e) {
-    let price = document.getElementById("addDiscountPriceField").value;
-    if (price.length == 0) {
-        makeToast("failure", "Please enter a price.", 3000);
-        return;
-    }
     let selectedProductName = document.getElementById("selectedSearchResult");
     if (selectedProductName === null) {
         makeToast("failure", "Please select a product.", 3000);
+        return;
+    }
+    let price = document.getElementById("addDiscountPriceField").value;
+    if (price.length == 0) {
+        makeToast("failure", "Please enter a price.", 3000);
         return;
     }
     selectedProductName = selectedProductName.childNodes[1].textContent;
@@ -923,7 +929,7 @@ async function addDiscount(e) {
         switch(data.condition_value) {
             case 0:
                 makeToast("partial-success", "Successfully added discount, but no points were awarded.", 3000);
-                break
+                break;
             case 1:
                 makeToast("success", "Successfully added discount. You were awarded 20 points.", 3000);
                 break;

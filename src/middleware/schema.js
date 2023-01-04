@@ -3,7 +3,9 @@
 * Request format objects contain the keys that should exist in the request, with the value being a JSONArray containing each expected parameter
 * If inside the JSONArray, there is another JSONArray of values, it means that:
 * --> If the first value is 0, exactly one of the following values is required
-* --> If the first value is 1, at least one of the following values if required
+* --> If the first value is 1, at least one of the following values is required
+* --> If the first value is a string, then the object must have a "type" parameter and if that parameter's value is equal to this string, 
+        then all of the following parameters must exist in the object, otherwise none of them must exist in it
 */
 
 const EXPECTED_DATA_GET = {
@@ -21,6 +23,9 @@ const EXPECTED_DATA_GET = {
     },
     "user": {
         "query": ["history_type"]
+    },
+    "admin": {
+        "query": ["type", ["discount_number", "year", "month_number"], ["weekly_discount", "start_date", "category_id"]]
     }
 };
 
@@ -63,16 +68,32 @@ const REQ_MATCH = {
 };
 
 function matchNestedArray(param_obj, arr) {
+    // flag: counter of how many of the included values exist in object
     let flag = 0;
     let mode = arr[0];
+
+    // if mode is string value and type doesn't match, ignore this nested array
+    if (typeof mode === "string" && param_obj.type !== mode) {
+        return true;
+    }
 
     for (let key of arr.slice(1)) {
         if (param_obj[key] !== undefined) {
             ++flag;
         }
     }
-    return mode === 0 ? flag === 1 : flag > 0;
 
+    switch (mode) {
+        // mode 0: exactly 1 required
+        case 0:
+            return flag === 1;
+        // mode 1: at least 1 required
+        case 1:
+            return flag > 0;
+        // default mode (string value): either none (type doesn't match string value) or all (type matches string value) required
+        default:
+            return flag === arr.length - 1;
+    }
 }
 
 function matchSchema(obj, req_type, endpoint) {

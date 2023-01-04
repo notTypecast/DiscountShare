@@ -4,7 +4,7 @@ async function changeUserDetails(username, new_username, new_pwd) {
     let u = new_username !== undefined;
     let p = new_pwd !== undefined;
     
-    let query = "UPDATE user SET last_updated=(UNIX_TIMESTAMP()) AND ";
+    let query = "UPDATE user SET last_updated=(UNIX_TIMESTAMP()), ";
     let args = [];
 
     if (u) {
@@ -12,7 +12,7 @@ async function changeUserDetails(username, new_username, new_pwd) {
         args.push(new_username);
 
         if (p) {
-            query += "AND ";
+            query += ", ";
         }
     }
 
@@ -21,13 +21,12 @@ async function changeUserDetails(username, new_username, new_pwd) {
         args.push(new_pwd);
     }
 
-    query += " WHERE username=?";
+    query += "WHERE username=?";
     args.push(username);
 
+    let result = await promiseQuery("SELECT is_admin FROM user WHERE username=?", username);
     await promiseQuery(query, args);
-
-    let result = await promiseQuery("SELECT is_admin FROM user WHERE username=?", u ? new_username : username);
-
+    
     return result[0].is_admin;
 }
 

@@ -10,7 +10,8 @@ out = {
     "data": []
 }
 
-c_date = datetime.fromtimestamp(data["fetch_date"])
+#c_date = datetime.fromtimestamp(data["fetch_date"])
+c_date = datetime.fromtimestamp(1673136000)
 
 
 dates_desc = []
@@ -34,5 +35,5 @@ for product in data["products"]:
             "price": p
         })
 
-with open("price_history.json", "w") as f:
-    json.dump(out, f, ensure_ascii=False)
+with open("price_history_2023-01-02.json", "w") as f:
+    json.dump(out, f, ensure_ascii=False, indent=2)
