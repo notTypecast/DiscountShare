@@ -1,5 +1,7 @@
 import { promiseQuery } from "../util/query.js";
 
+const USERS_PER_PAGE = 10;
+
 async function deleteProducts() {
     await promiseQuery("DELETE FROM product", null);
 
@@ -26,12 +28,12 @@ async function getDiscountNumberByMonth(year, month_number) {
 }
 
 async function getWeeklyDiscountData(start_date, category_id, subcategory_id) {
-    let query = `SELECT p_date, AVG(CASE WHEN d.cost < p.avg_cost THEN 1 - d.cost/p.avg_cost ELSE NULL END) as day_avg
+    let query = `SELECT p_date, COALESCE(AVG(CASE WHEN d.cost < p.avg_cost THEN 1 - d.cost/p.avg_cost ELSE NULL END)*100, 0) AS day_avg
     FROM (
-        SELECT product_name, cost, DATE(DATE_ADD(posted, INTERVAL 12 HOUR)) AS p_date
+        SELECT product_name, cost, DATE(posted) AS p_date
         FROM discount
         UNION ALL
-        SELECT product_name, cost, DATE(DATE_ADD(posted, INTERVAL 12 HOUR)) AS p_date
+        SELECT product_name, cost, DATE(posted) AS p_date
         FROM expired_discount
     ) AS d INNER JOIN (
         SELECT product_name, AVG(cost) AS avg_cost
@@ -56,4 +58,24 @@ async function getWeeklyDiscountData(start_date, category_id, subcategory_id) {
     return results;
 }
 
-export { deleteProducts, deletePOIs, getDiscountNumberByMonth, getWeeklyDiscountData };
+async function getLeaderboardData(page) {
+    let limit_start = 0;
+    if (page > 0) {
+        limit_start = USERS_PER_PAGE*page;
+    }
+
+    let results = await promiseQuery(`SELECT username, (CASE WHEN total_review_score < 0 THEN 0 ELSE total_review_score END) as total_score, review_score, total_tokens, email, is_admin
+    FROM user
+    ORDER BY total_review_score DESC
+    LIMIT ?, ?`, [limit_start, USERS_PER_PAGE]);
+
+    let total_users = (await promiseQuery("SELECT COUNT(*) as total FROM user"))[0].total;
+    let total_pages = Math.ceil(total_users / USERS_PER_PAGE);
+
+    return {
+        total_pages: total_pages,
+        page_users: results
+    };
+}
+
+export { deleteProducts, deletePOIs, getDiscountNumberByMonth, getWeeklyDiscountData, getLeaderboardData };

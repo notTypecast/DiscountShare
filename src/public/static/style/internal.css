@@ -236,6 +236,7 @@ main {
     font-family: "Roboto" ,sans-serif;
     font-weight: 300;
     font-size: 1.7rem;
+    text-align: center;
 }
 
 .table-page-section {
@@ -321,6 +322,39 @@ main {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     margin: 7px 10px;
 }
+
+.internal-pager-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.internal-pager-wrap .material-icons {
+    font-size: 1.8rem;
+    user-select: none;
+    color: rgb(95, 95, 95);
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+    left:0;
+}
+
+.internal-pager-wrap .material-icons:hover {
+    color: rgb(0, 0, 0);
+}
+
+.internal-pager-wrap .material-icons:nth-child(1):hover {
+    left: -3px;
+}
+
+.internal-pager-wrap .material-icons:nth-child(2):hover {
+    left: 3px;
+}
+
+
 
 
 @media (max-width: 768px) {

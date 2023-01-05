@@ -1,4 +1,4 @@
-import {  } from "../models/adminModel.js";
+import { getLeaderboardData } from "../models/adminModel.js";
 import { updateProductsFromFile } from "../models/productModel.js";
 import { updatePricesFromFile } from "../models/priceModel.js";
 import { updatePOIsFromFile } from "../models/poiModel.js";
@@ -28,6 +28,14 @@ async function adminControllerGet(req, res) {
                 const category_id = req.query.category_id;
                 const subcategory_id = req.query.subcategory_id;
                 results = await getWeeklyDiscountData(start_date, category_id, subcategory_id);
+                const data_obj = results.reduce((accumulator, current) => {
+                    accumulator[current.p_date] = current.day_avg;
+                    return accumulator;
+                }, {});
+                return res.status(200).json(data_obj);
+            case "leaderboard":
+                const page = req.query.page;
+                results = await getLeaderboardData(page === undefined ? 0 : page - 1);
                 return res.status(200).json(results);
             default:
                 return res.status(400).json({error: "Unknown type."});
@@ -36,9 +44,6 @@ async function adminControllerGet(req, res) {
         console.log(err);
         return res.status(500).json({error: "Internal server error."});
     }
-
-    return res.status(200).end();
-
 
 }
 

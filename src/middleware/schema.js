@@ -25,7 +25,7 @@ const EXPECTED_DATA_GET = {
         "query": ["history_type"]
     },
     "admin": {
-        "query": ["type", ["discount_number", "year", "month_number"], ["weekly_discount", "start_date", "category_id"]]
+        "query": ["type", ["discount_number", "year", "month_number"], ["weekly_discount", "start_date", "category_id"], ["leaderboard"]]
     }
 };
 

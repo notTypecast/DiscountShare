@@ -26,7 +26,7 @@ input[type="file"] {
     margin-right: 5px;
 }
 
-.daily-discounts-graph-wrap {
+.discounts-graph-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -35,9 +35,26 @@ input[type="file"] {
     width: 100%;
 }
 
-.daily-discounts-selectors-wrap {
+.graph-selectors-wrap {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
+}
+
+.clear-selection-text {
+    font-size: 1rem;
+    font-family: "Roboto", sans-serif;
+    color: #056147;
+    font-weight: 300;
+    cursor: pointer;
+    margin-left: 10px;
+    text-decoration: underline;
+    user-select: none;
+}
+
+@media (max-width: 768px) {
+    .graph-selectors-wrap {
+        flex-direction: column;
+    }
 }
