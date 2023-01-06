@@ -56,7 +56,7 @@ const EXPECTED_DATA_PATCH = {
 
 const EXPECTED_DATA_DELETE = {
     "admin": {
-        "query": ["type"]
+        "query": ["type", ["products"], ["poi"], ["discount", "shop_id", "product_name"]]
     }
 }
 

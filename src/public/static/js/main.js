@@ -2,6 +2,7 @@ const shopsEndpoint = "/api/shops";
 const categoriesEndpoint = "/api/categories";
 const discountsEndpoint = "/api/discounts";
 const productsEndpoint = "/api/products";
+const adminEndpoint = "/api/admin";
 const logoutBtn = document.getElementById("logoutBtn");
 const adminBtn = document.getElementById("adminBtn");
 const filterHeader = document.getElementById("filtersHeader");
@@ -433,6 +434,7 @@ function createDiscountCard(properties, allowOffers, shop_id, index) {
     dislikes.appendChild(dislikeIcon);
     dislikes.appendChild(document.createTextNode(properties.dislikes));
     reviewWrap.appendChild(dislikes);
+
     let markOos = document.createElement("p");
     markOos.classList.add("discount-review-btn");
     markOos.setAttribute("title", "Mark this product as out of stock");
@@ -442,6 +444,15 @@ function createDiscountCard(properties, allowOffers, shop_id, index) {
     markOosIcon.innerText = "production_quantity_limits";
     markOos.appendChild(markOosIcon);
     reviewWrap.appendChild(markOos);
+
+    let deleteDiscount = document.createElement("p");
+    deleteDiscount.classList.add("discount-review-btn");
+    deleteDiscount.setAttribute("title", "Mark this product as out of stock");
+    deleteDiscount.setAttribute("data-action", "mark_oos");
+    let deleteDiscountIcon = document.createElement("span");
+    deleteDiscountIcon.classList.add("material-icons");
+    deleteDiscountIcon.innerText = "delete_forever";
+    deleteDiscount.appendChild(deleteDiscountIcon);
 
     if (allowOffers) {
         likes.classList.add("discount-review-btn-allowed");
@@ -457,6 +468,12 @@ function createDiscountCard(properties, allowOffers, shop_id, index) {
             await reviewDiscount(e, "mark_oos", shop_id, properties.product_name);
         });
 
+    }
+
+    if (is_admin) {
+        deleteDiscount.classList.add("discount-review-btn-allowed");
+        reviewWrap.appendChild(deleteDiscount);
+        deleteDiscount.addEventListener("click", deleteDiscountEvent);
     }
 
     cardBottomBar.appendChild(reviewWrap);
@@ -556,6 +573,19 @@ function markDiscountOutOfStockUI(discountNode, bisEvent) {
     markBis.appendChild(document.createTextNode("Mark back in stock"));
     discountNode.querySelector(".discount-review-wrap").appendChild(markBis);
     markBis.addEventListener("click", bisEvent);
+    
+    if (is_admin) {
+        let deleteDiscount = document.createElement("p");
+        deleteDiscount.classList.add("discount-mark-bis");
+        deleteDiscount.classList.add("discount-delete-while-oos");
+        let deleteIcon = document.createElement("span");
+        deleteIcon.classList.add("material-icons");
+        deleteIcon.innerText = "delete_forever";
+        deleteDiscount.appendChild(deleteIcon);
+        deleteDiscount.appendChild(document.createTextNode("Delete"));
+        discountNode.querySelector(".discount-review-wrap").appendChild(deleteDiscount);
+        deleteDiscount.addEventListener("click", deleteDiscountEvent);
+    }
 
 }
 
@@ -577,6 +607,9 @@ function markDiscountBackInStockUI(discountNode) {
 
     let markBis = discountNode.querySelector(".discount-mark-bis");
     markBis.remove();
+
+    let deleteWhileOos = discountNode.querySelector(".discount-delete-while-oos");
+    if (deleteWhileOos) deleteWhileOos.remove();
 }
 
 function generateMarkBackInStockEvent(discountNode, shop_id, product_name) {
@@ -914,6 +947,7 @@ async function addDiscount(e) {
         makeToast("failure", "Please enter a price.", 3000);
         return;
     }
+
     selectedProductName = selectedProductName.childNodes[1].textContent;
 
     showLoader();
@@ -954,6 +988,41 @@ async function addDiscount(e) {
         discountsWrap.replaceWith(newWrap);
         hideLoader();
     } else {
+        makeToast("failure", data.error, 3000);
+    }
+}
+
+async function deleteDiscountEvent(e) {
+    const conf = confirm("Are you sure you want to delete this discount? This action cannot be undone.");
+    if (!conf) {
+        return;
+    }
+    let parent = e.target.parentElement;
+    while (!parent.classList.contains("discount")) {
+        parent = parent.parentElement;
+    }
+
+    showLoader();
+    const response = await sameOriginDeleteRequest(adminEndpoint, {
+        "type": "discount",
+        "shop_id": currentShopId,
+        "product_name": parent.querySelector(".discount-title").textContent
+    });
+    hideLoader();
+    if (response.status>=200 && response.status<300) {
+        makeToast("success", "Successfully deleted discount.", 3000);
+        parent.remove()
+        let discountsWrap = document.querySelector(".discounts-wrap");
+        if (discountsWrap.children.length == 0) {
+            let p = document.createElement("p");
+            p.classList.add("no-discounts");
+            p.innerText = "No discounts available.";
+            discountsWrap.appendChild(p);
+        }
+
+
+    } else {
+        const data = await response.json();
         makeToast("failure", data.error, 3000);
     }
 }

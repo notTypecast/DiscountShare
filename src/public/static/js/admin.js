@@ -107,10 +107,7 @@ async function productsRoute() {
     mainView.addSection("Delete Product Data", createDeleteButton("products", "Are you sure you want to delete all product data? This cannot be undone.", "Product data successfully deleted."));
 
     mainView.displaySections();
-
     disableHold(onHold);
-    
-
 }
 
 async function shopsRoute() {
@@ -123,21 +120,17 @@ async function shopsRoute() {
     mainView.addSection("Delete Shop Data", createDeleteButton("poi", "Are you sure you want to delete all shop data? This cannot be undone.", "Shop data successfully deleted."));
 
     mainView.displaySections();
-
     disableHold(onHold);
 }
 
 async function adminStatisticsRoute() {
     mainView.setTitle("Admin Statistics");
 
-
-
     const dailyDiscountsWrap = document.createElement("div");
     dailyDiscountsWrap.classList.add("discounts-graph-wrap");
 
     const dailyDiscountsSelectorsWrap = document.createElement("div");
     dailyDiscountsSelectorsWrap.classList.add("graph-selectors-wrap");
-    
 
     const monthDropdown = createDropdown("internal-dropdown", "monthDropdown", [], "Please select a month");
     const currentYear = parseInt(currentDate.getFullYear());
@@ -169,9 +162,7 @@ async function adminStatisticsRoute() {
     dailyDiscountsSelectorsWrap.appendChild(yearDropdown);
     dailyDiscountsSelectorsWrap.appendChild(monthDropdown);
 
-
     dailyDiscountsWrap.appendChild(dailyDiscountsSelectorsWrap);
-
 
     const dailyDiscountsGraphCanvas = document.createElement("canvas");
 
@@ -292,7 +283,6 @@ async function adminStatisticsRoute() {
     weeklyDiscountsSelectorsWrap.appendChild(categoryDropdown);
     weeklyDiscountsSelectorsWrap.appendChild(subcategoryDropdown);
 
-
     const weeklyDiscountsWrap = document.createElement("div");
     weeklyDiscountsWrap.classList.add("discounts-graph-wrap");
     const weeklyDiscountsCanvas = document.createElement("canvas");
@@ -333,42 +323,128 @@ async function adminStatisticsRoute() {
     weeklyDiscountsWrap.appendChild(clearSelectionText);
     weeklyDiscountsWrap.appendChild(weeklyDiscountsSelectorsWrap);
 
-
     const pagerWrap = document.createElement("div");
     pagerWrap.classList.add("internal-pager-wrap");
     
     const pagerLeft = document.createElement("span");
     pagerLeft.classList.add("material-icons");
+    pagerLeft.classList.add("pager-left");
     pagerLeft.innerText = "chevron_left";
     pagerLeft.addEventListener("click", (e) => changeWeek(e, "left"));
 
     const pagerRight = document.createElement("span");
     pagerRight.classList.add("material-icons");
+    pagerRight.classList.add("pager-right");
     pagerRight.innerText = "chevron_right";
     pagerRight.addEventListener("click", (e) => changeWeek(e, "right"));
-
-
 
     pagerWrap.appendChild(pagerLeft);
     pagerWrap.appendChild(pagerRight);
 
-
     weeklyDiscountsWrap.appendChild(pagerWrap);
     weeklyDiscountsWrap.appendChild(weeklyDiscountsCanvas);
-
-
-
-
-
 
     mainView.addSection("Average discount percentage per day", weeklyDiscountsWrap);
 
     mainView.displaySections();
-
     disableHold(onHold);
 }
 
-async function leaderboardRoute() {}
+async function leaderboardRoute() {
+    mainView.setTitle("Leaderboard");
+    
+    const leaderboardWrap = document.createElement("div");
+    leaderboardWrap.classList.add("leaderboard-wrap");
+
+    let page = 1;
+    let total_pages;
+    
+    async function changePage(e, table, direction) {
+        switch (direction) {
+            case "left":
+                if (page > 1) {
+                    --page;
+                }
+                else {
+                    return;
+                }
+                break;
+            case "right":
+                if (page < total_pages) {
+                    ++page;
+                }
+                else {
+                    return;
+                }
+                break;
+        }
+
+        document.querySelector(".internal-pager-text").innerText =`Showing page ${page} of ${total_pages}`;
+
+        const data = await getLeaderboardPage(page);
+
+        table.clearRows();
+        for (let row of data.page_users) {
+            table.appendRow([row.username, row.total_score, row.review_score, row.total_tokens, row.email, row.is_admin ? "Yes" : "No"]);
+        }
+    }
+    
+    const data = await getLeaderboardPage(page);
+    total_pages = data.total_pages;
+    let leaderboardTableNode;
+    if (data.page_users.length > 0) {
+        const pagerWrap = document.createElement("div");
+        pagerWrap.classList.add("internal-pager-wrap");
+        pagerWrap.classList.add("leaderboard-pager-wrap");
+        
+        const pagerLeft = document.createElement("span");
+        pagerLeft.classList.add("material-icons");
+        pagerLeft.classList.add("pager-left");
+        pagerLeft.innerText = "chevron_left";
+        
+        const pagerRight = document.createElement("span");
+        pagerRight.classList.add("material-icons");
+        pagerRight.classList.add("pager-right");
+        pagerRight.innerText = "chevron_right";
+
+        const pagerText = document.createElement("span");
+        pagerText.classList.add("internal-pager-text");
+        pagerText.innerText = `Showing page ${page} of ${total_pages}`;
+
+        pagerWrap.appendChild(pagerLeft);
+        pagerWrap.appendChild(pagerText);
+        pagerWrap.appendChild(pagerRight);
+        leaderboardWrap.appendChild(pagerWrap);
+
+        let discountsTable = new TableCreator(["Username", "Total review score", "Monthly review score", "Tokens", "E-mail address", "Admin"]);
+        pagerLeft.addEventListener("click", (e) => changePage(e, discountsTable, "left"));
+        pagerRight.addEventListener("click", (e) => changePage(e, discountsTable, "right"));
+        
+        for (let row of data.page_users) {
+            discountsTable.appendRow([row.username, row.total_score, row.review_score, row.total_tokens, row.email, row.is_admin ? "Yes" : "No"]);
+        }
+        
+        leaderboardWrap.append(discountsTable.getTable());
+        mainView.addSection("Sorting users by highest total review score", leaderboardWrap, ["table-page-section"]);
+    } else {
+        let p = document.createElement("p");
+        p.innerHTML = "No user data found.";
+        p.classList.add("no-results");
+        leaderboardWrap.append(p);
+        mainView.addSection(null, p);
+    }
+    
+    mainView.displaySections();
+    disableHold(onHold);
+}
+
+
+
+/*
+====================
+Helper functions
+====================
+*/
 
 async function getDailyDiscountNumber(month, year) {
     showLoader();
@@ -486,11 +562,28 @@ function getPreviousMonday(date = new Date()) {
 }
 
 function getISODate(dateObj = new Date()) {
-    let tmp = dateObj.toLocaleDateString('en-GB', {
+    const tmp = dateObj.toLocaleDateString('en-GB', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
     });
     
     return tmp.slice(6, 10) + "-" + tmp.slice(3, 5) + "-" + tmp.slice(0, 2);  
+}
+
+async function getLeaderboardPage(pageNo) {
+    showLoader();
+    const response = await sameOriginGetRequest(adminEndpoint, {
+        "type": "leaderboard",
+        "page": (pageNo === undefined)? 1: pageNo
+    });
+    const data = await response.json();
+    hideLoader();
+    
+    if (!response.status >= 200 && response.status < 300) {
+        makeToast("failure", data.error, 3000);
+        return;
+    }
+
+    return data;
 }

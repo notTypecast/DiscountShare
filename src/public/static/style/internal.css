@@ -335,7 +335,7 @@ main {
 .internal-pager-wrap .material-icons {
     font-size: 1.8rem;
     user-select: none;
-    color: rgb(95, 95, 95);
+    color: rgb(138, 138, 138);
     cursor: pointer;
     transition: all .15s;
     position: relative;
@@ -343,17 +343,26 @@ main {
 }
 
 .internal-pager-wrap .material-icons:hover {
-    color: rgb(0, 0, 0);
+    /* color: rgb(0, 0, 0); */
+    color: #056147;
 }
 
-.internal-pager-wrap .material-icons:nth-child(1):hover {
+.pager-left:hover {
     left: -3px;
 }
 
-.internal-pager-wrap .material-icons:nth-child(2):hover {
+.pager-right:hover {
     left: 3px;
 }
 
+.internal-pager-text {
+    color: #3d3d3d;
+}
+
+.loader {
+    right: 60px !important;
+    left:auto !important;
+}
 
 
 

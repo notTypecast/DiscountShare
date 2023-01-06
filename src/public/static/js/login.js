@@ -8,7 +8,7 @@ const loginEndpoint = "/api/login";
 setSubmitButton(submitButton);
 setWarningLocation(submitButton);
 
-usernameInput.addEventListener("keyup", () => {
+usernameInput.addEventListener("input", () => {
     const text = usernameInput.value;
 
     removeWarnings(usernameInput);

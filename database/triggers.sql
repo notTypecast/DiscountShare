@@ -5,6 +5,7 @@ DROP TRIGGER IF EXISTS save_expired_discount;
 DROP TRIGGER IF EXISTS review_score_rating_insert;
 DROP TRIGGER IF EXISTS review_score_rating_delete;
 DROP TRIGGER IF EXISTS review_score_rating_update;
+DROP TRIGGER IF EXISTS last_timer_id;
 DELIMITER //
 -- Ensures a user cannot rate their own post
 CREATE TRIGGER self_review_check
@@ -97,6 +98,13 @@ FOR EACH ROW
 BEGIN
     CALL undo_review_score_rating(OLD.rating, OLD.shop_id, OLD.product_name);
     CALL new_review_score_rating(NEW.rating, NEW.shop_id, NEW.product_name);
+END//
+-- Saves timer ID to variable
+CREATE TRIGGER last_timer_id
+AFTER INSERT ON timed_event
+FOR EACH ROW
+BEGIN
+    SET @timer_id=NEW.id;
 END//
 
 DELIMITER ;

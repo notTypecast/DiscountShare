@@ -27,7 +27,7 @@ function confirmPasswordEventListener() {
     }
 }
 
-usernameInput.addEventListener("keyup", () => {
+usernameInput.addEventListener("input", () => {
     const text = usernameInput.value;
 
     removeWarnings(usernameInput);
@@ -49,7 +49,7 @@ usernameInput.addEventListener("keyup", () => {
     }
 });
 
-emailInput.addEventListener("keyup", () => {
+emailInput.addEventListener("input", () => {
     const text = emailInput.value;
 
     removeWarnings(emailInput);
@@ -63,7 +63,7 @@ emailInput.addEventListener("keyup", () => {
     }
 });
 
-passwordInput.addEventListener("keyup", () => {
+passwordInput.addEventListener("input", () => {
     const text = passwordInput.value;
 
     removeWarnings(passwordInput);
@@ -91,7 +91,7 @@ passwordInput.addEventListener("keyup", () => {
     }
 });
 
-confirmPasswordInput.addEventListener("keyup", confirmPasswordEventListener);
+confirmPasswordInput.addEventListener("input", confirmPasswordEventListener);
 
 submitButton.addEventListener("click", async (e) => {
     e.preventDefault();

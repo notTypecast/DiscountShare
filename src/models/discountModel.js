@@ -1,4 +1,5 @@
-import { promiseQuery } from "../util/query.js";
+import { promiseQuery, atomicPromiseQueries } from "../util/query.js";
+import { getDatetimeFromObject } from "../util/date.js";
 
 async function getDiscounts(shop_id, username) {
     let results = await promiseQuery(`SELECT discount.product_name, discount.username, discount.cost, (CASE WHEN price.cost IS NULL THEN 2
@@ -40,9 +41,24 @@ async function getDiscounts(shop_id, username) {
 }
 
 async function addDiscount(shop_id, product_name, cost, username) {
-    await promiseQuery("INSERT INTO discount(shop_id, product_name, cost, username, posted, expiry) VALUES (?, ?, ?, ?, NOW(), NOW() + INTERVAL 1 WEEK) ON DUPLICATE KEY UPDATE cost=VALUES(cost), username=VALUES(username), posted=VALUES(posted), expiry=VALUES(expiry), in_stock=1", [shop_id, product_name, cost, username]);
+    const expiry = new Date();
+    expiry.setDate(expiry.getDate() + 7);
+    let formattedDatetime = getDatetimeFromObject(expiry);
 
-    let result = await promiseQuery("SELECT @discount_condition_value AS condition_value", null);
+    const id = await global.discountEventGroup.addEvent(formattedDatetime);
+    console.log("My new timer ID is: ", id);
+
+    const queries = [
+        "INSERT INTO discount(shop_id, product_name, cost, username, posted, expiry, timer_id) VALUES (?, ?, ?, ?, NOW(), ?, ?) ON DUPLICATE KEY UPDATE cost=VALUES(cost), username=VALUES(username), posted=VALUES(posted), expiry=VALUES(expiry), in_stock=1, timer_id=VALUES(timer_id)",
+        "SELECT @discount_condition_value AS condition_value"
+    ];
+    const args_per_query = [
+        [shop_id, product_name, cost, username, formattedDatetime, id],
+        null
+    ];
+
+    // run queries as transaction so there are no race conditions for @discount_condition_value
+    const result = await atomicPromiseQueries(queries, args_per_query);
 
     return result[0];
 }

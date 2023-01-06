@@ -2,7 +2,7 @@ import { getLeaderboardData } from "../models/adminModel.js";
 import { updateProductsFromFile } from "../models/productModel.js";
 import { updatePricesFromFile } from "../models/priceModel.js";
 import { updatePOIsFromFile } from "../models/poiModel.js";
-import { deleteProducts, deletePOIs, getDiscountNumberByMonth, getWeeklyDiscountData } from "../models/adminModel.js";
+import { deleteProducts, deletePOIs, deleteDiscount, getDiscountNumberByMonth, getWeeklyDiscountData } from "../models/adminModel.js";
 import fs from "fs/promises";
 
 
@@ -86,6 +86,11 @@ async function adminControllerDelete(req, res) {
             break;
         case "poi":
             await deletePOIs();
+            break;
+        case "discount":
+            const shop_id = req.query.shop_id;
+            const product_name = req.query.product_name;
+            await deleteDiscount(shop_id, product_name);
             break;
         default:
             return res.status(400).json({error: "Unknown type."});

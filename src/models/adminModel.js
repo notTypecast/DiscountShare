@@ -12,6 +12,12 @@ async function deletePOIs() {
     await promiseQuery("DELETE FROM shop", null);
 }
 
+async function deleteDiscount(shop_id, product_name) {
+    await promiseQuery("DELETE FROM discount WHERE shop_id=? AND product_name=?", [shop_id, product_name]);
+
+    return null;
+}
+
 async function getDiscountNumberByMonth(year, month_number) {
     let results = await promiseQuery(`SELECT COUNT(*) AS total_discounts, DAY(posted) as day
     FROM (
@@ -78,4 +84,4 @@ async function getLeaderboardData(page) {
     };
 }
 
-export { deleteProducts, deletePOIs, getDiscountNumberByMonth, getWeeklyDiscountData, getLeaderboardData };
+export { deleteProducts, deletePOIs, deleteDiscount, getDiscountNumberByMonth, getWeeklyDiscountData, getLeaderboardData };

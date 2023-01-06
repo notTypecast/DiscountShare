@@ -20,6 +20,7 @@ async function discountsControllerPost(req, res) {
     let cost = req.body.cost;
     let username = res.locals.user_data.username;
     let results;
+
     try {
         results = await addDiscount(shop_id, product_name, cost, username);
     } catch (err) {
@@ -28,6 +29,9 @@ async function discountsControllerPost(req, res) {
         }
         if (err.code === "ER_BAD_NULL_ERROR") {
             return res.status(400).json({error: "Expected a value."})
+        }
+        if (err.code === "ER_WARN_DATA_OUT_OF_RANGE") {
+            return res.status(400).json({error: "Price too large."});
         }
 
         console.log(err);        

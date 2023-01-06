@@ -111,6 +111,12 @@ class TableCreator {
         });
         this.tableRoot.appendChild(newtr);
     }
+
+    clearRows() {
+        while (this.tableRoot.children.length > 1) {
+            this.tableRoot.children[1].remove();
+        }
+    }
 }
 
 function createUploadForm(inputId, submitEvent) {

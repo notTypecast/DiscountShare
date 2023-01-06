@@ -1,38 +1,45 @@
+DROP PROCEDURE IF EXISTS calculate_condition_value;
 DROP PROCEDURE IF EXISTS calculate_review_points;
 DROP PROCEDURE IF EXISTS new_review_score_rating;
 DROP PROCEDURE IF EXISTS undo_review_score_rating;
 DROP PROCEDURE IF EXISTS backup_discount;
 
 DELIMITER //
--- Calculates review points that a user should get for a new discount based on existing prices
--- Creates variable @discount_condition_value that is 2 for 50 points, 1 for 20 and 0 for none
-CREATE PROCEDURE calculate_review_points(IN new_name VARCHAR(255) CHARSET utf8, IN new_cost DECIMAL(10, 2), IN new_username VARCHAR(24) CHARSET utf8)
+-- Calculates condition value of discount that is 2 for good discount, 1 for average and 0 for bad and saves in @discount_condition_value
+CREATE PROCEDURE calculate_condition_value(IN prod_name VARCHAR(255) CHARSET utf8, IN new_cost DECIMAL(10, 2))
 BEGIN
     DECLARE day_avg DECIMAL(10, 2);
-    -- Get most recent day average for product
-    SELECT cost INTO day_avg FROM price WHERE product_name=new_name AND day_date <> CURDATE() ORDER BY DATE(day_date) DESC LIMIT 1;
+    -- Get yesterday's average price for product (or most recent, if yesterday's doesn't exist)
+    SELECT cost INTO day_avg FROM price WHERE product_name=prod_name AND day_date <> CURDATE() ORDER BY DATE(day_date) DESC LIMIT 1;
 
     -- Check if new price is over 20% better than most recent day average
     IF (new_cost < 0.8*day_avg) THEN
-        BEGIN
-        UPDATE user SET review_score=review_score+50, total_review_score=total_review_score+50 WHERE username=new_username;
         SET @discount_condition_value = 2;
-        END;
     -- Check if new price is over 20% better than most recent week average
     ELSE
         BEGIN
         -- Get most recent week average for product
         DECLARE week_avg DECIMAL(10, 2);
-        SELECT AVG(cost) INTO week_avg FROM price WHERE product_name=new_name AND day_date >= DATE_SUB(CURDATE(), INTERVAL 8 DAY) AND day_date <> CURDATE();
+        SELECT AVG(cost) INTO week_avg FROM price WHERE product_name=prod_name AND day_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND day_date <> CURDATE();
         IF (new_cost < 0.8*week_avg) THEN
-            BEGIN
-            UPDATE user SET review_score=review_score+20, total_review_score=total_review_score+20 WHERE username=new_username;
             SET @discount_condition_value = 1;
-            END;
         ELSE
             SET @discount_condition_value = 0;
         END IF;
         END;
+    END IF;
+END//
+
+-- Calculates review points that a user should get for a new discount based on existing prices
+-- Creates variable @discount_condition_value that is 2 for 50 points, 1 for 20 and 0 for none
+CREATE PROCEDURE calculate_review_points(IN new_name VARCHAR(255) CHARSET utf8, IN new_cost DECIMAL(10, 2), IN new_username VARCHAR(24) CHARSET utf8)
+BEGIN
+    CALL calculate_condition_value(new_name, new_cost);
+    
+    IF (@discount_condition_value = 2) THEN
+        UPDATE user SET review_score=review_score+50, total_review_score=total_review_score+50 WHERE username=new_username;
+    ELSEIF (@discount_condition_value = 1) THEN
+        UPDATE user SET review_score=review_score+20, total_review_score=total_review_score+20 WHERE username=new_username;
     END IF;
 END//
 

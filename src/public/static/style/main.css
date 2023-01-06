@@ -351,6 +351,7 @@ nav {
 
 .discount-review-btn-allowed {
     cursor: pointer;
+    user-select: none;
 }
 
 .discount-review-btn-allowed:hover {
@@ -384,6 +385,22 @@ nav {
     margin-right: 4px;
     color: #266dd3;
     opacity: 1 !important;
+}
+
+.discount-delete-while-oos {
+    color: rgb(201, 39, 39);
+}
+
+.discount-delete-while-oos .material-icons {
+    color:rgb(201, 39, 39)
+}
+
+.discount-delete-while-oos:hover {
+    color: rgb(211, 59, 59);
+}
+
+.discount-delete-while-oos:hover .material-icons {
+    color: rgb(211, 59, 59);
 }
 
 
