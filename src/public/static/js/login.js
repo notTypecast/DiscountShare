@@ -30,9 +30,30 @@ usernameInput.addEventListener("input", () => {
     }
 });
 
+passwordInput.addEventListener("input", () => {
+    const pass = passwordInput.value;
+
+    removeWarnings(passwordInput);
+
+    if (pass.length == 0) {
+        addWarning(passwordInput, "Password cannot be empty.");
+        return;
+    }
+});
+
 submitButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
+    if (usernameInput.value.length == 0) {
+        addWarning(usernameInput, "Username cannot be empty.");
+        return;
+    }
+
+    if (passwordInput.value.length == 0) {
+        addWarning(passwordInput, "Password cannot be empty.");
+        return;
+    }
+    
     showLoader();
     const response = await sameOriginPostRequest(loginEndpoint, {
         "username": usernameInput.value,

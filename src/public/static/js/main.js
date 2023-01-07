@@ -725,7 +725,6 @@ function createDiscountModal(discAddWrap, properties) {
     let discAddSearchResultsWrap = document.createElement("div");
     discAddSearchResultsWrap.classList.add("discount-add-search-results-wrap");
     discAddSearchResultsWrap.id = "discountAddSearchResultsWrap";
-    // TODO: add search results and event listener
     discAddSearchWrap.appendChild(discAddSearchResultsWrap);
     discAddForm.appendChild(discAddSearchWrap);
 
@@ -859,7 +858,6 @@ async function searchProducts(e) {
     }
 
     showLoader();
-    // TODO: maybe change way of returning error
     let response = await sameOriginGetRequest(productsEndpoint, searchBody);
     
     let products = await response.json();
@@ -948,10 +946,13 @@ async function addDiscount(e) {
         return;
     }
 
+
     selectedProductName = selectedProductName.childNodes[1].textContent;
 
     showLoader();
     let response = await sameOriginPostRequest(discountsEndpoint, {
+        "latitude": latitude,
+        "longitude": longitude,
         "shop_id": currentShopId,
         "product_name": selectedProductName,
         "cost": parseFloat(price)

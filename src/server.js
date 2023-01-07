@@ -4,11 +4,9 @@ import cookieParser from "cookie-parser";
 import mysql from "mysql";
 import cors from "cors";
 import { TimedEventGroup, discountEventHandler, monthlyTokensEventHandler } from "./util/events.js";
+import { getDatetimeFromObject, getNextMonthDate } from "./util/date.js";
 import { requireAuth, requireAdmin } from "./middleware/requireAuth.js";
 import { loggedIn } from "./middleware/loggedIn.js";
-import { updatePOIsFromFile } from "./models/poiModel.js";
-import { updateProductsFromFile } from "./models/productModel.js";
-import { updatePricesFromFile } from "./models/priceModel.js";
 
 dotenv.config();
 const app = express();
@@ -20,26 +18,7 @@ global.pool = mysql.createPool({
     dateStrings: true
 });
 
-/*
-import { promiseQuery } from "./util/query.js";
-
-let eventgroup = new TimedEventGroup(0, async (event) => {
-    console.log(await promiseQuery("SELECT * FROM timed_event"));
-});
-
-(async function() {
-    await eventgroup.initialize();
-
-    //await eventgroup.addEvent("2023-01-06 19:46:30");
-})();
-*/
-
-// TODO REMOVE THIS
-(async function() {
-    await updateProductsFromFile("data/products.json");
-    await updatePricesFromFile("data/price_history.json");
-    await updatePOIsFromFile("data/POIs.json");
-})();
+global.DEBUG_EDIT_DISCOUNTS = false;
 
 global.discountEventGroup = new TimedEventGroup(0, discountEventHandler);
 global.monthlyTokensEventGroup = new TimedEventGroup(1, monthlyTokensEventHandler);
@@ -47,6 +26,10 @@ global.monthlyTokensEventGroup = new TimedEventGroup(1, monthlyTokensEventHandle
 (async () => {
     await global.discountEventGroup.initialize();
     await global.monthlyTokensEventGroup.initialize();
+    // set initial event if it doesn't exist
+    if (global.monthlyTokensEventGroup.current_event === null) {
+        global.monthlyTokensEventGroup.addEvent(getDatetimeFromObject(getNextMonthDate()));
+    }
 })();
 
 import { registerRouter } from "./routes/register.js";

@@ -15,7 +15,7 @@ async function shopsController(req, res) {
     }
 
     for (let row of results) {
-        if (distanceBetween(user_lat, user_long, row.latitude, row.longitude) < 50000) { // TODO: 50 HERE
+        if (distanceBetween(user_lat, user_long, row.latitude, row.longitude) < (global.DEBUG_EDIT_DISCOUNTS ? 50000 : 50)) {
             row.allowOffers = true;
         }
         else {

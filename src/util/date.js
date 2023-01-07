@@ -11,4 +11,9 @@ function getDatetimeFromObject(date) {
     return formattedDate;
 }
 
-export { getDatetimeFromObject };
+// Given a date object, return the date of the next month
+function getNextMonthDate(date = new Date()) {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 1);
+}
+
+export { getDatetimeFromObject, getNextMonthDate };

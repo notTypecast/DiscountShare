@@ -5,7 +5,7 @@ DROP TRIGGER IF EXISTS save_expired_discount;
 DROP TRIGGER IF EXISTS review_score_rating_insert;
 DROP TRIGGER IF EXISTS review_score_rating_delete;
 DROP TRIGGER IF EXISTS review_score_rating_update;
-DROP TRIGGER IF EXISTS last_timer_id;
+
 DELIMITER //
 -- Ensures a user cannot rate their own post
 CREATE TRIGGER self_review_check
@@ -25,8 +25,8 @@ CREATE TRIGGER discount_update_check
 BEFORE UPDATE ON discount
 FOR EACH ROW
 BEGIN
-    -- Allow updates on in_stock alone
-    IF (NOT (NEW.shop_id=OLD.shop_id AND NEW.product_name=OLD.product_name AND NEW.cost=OLD.cost AND NEW.username=OLD.username AND NEW.posted=OLD.posted AND NEW.expiry=OLD.expiry)) THEN
+    -- Allow updates on in_stock and/or expiry only
+    IF (NOT (NEW.shop_id=OLD.shop_id AND NEW.product_name=OLD.product_name AND NEW.cost=OLD.cost AND NEW.username=OLD.username AND NEW.posted=OLD.posted)) THEN
         BEGIN
         -- Ensure price is positive
         IF (NEW.cost < 0) THEN
@@ -98,13 +98,6 @@ FOR EACH ROW
 BEGIN
     CALL undo_review_score_rating(OLD.rating, OLD.shop_id, OLD.product_name);
     CALL new_review_score_rating(NEW.rating, NEW.shop_id, NEW.product_name);
-END//
--- Saves timer ID to variable
-CREATE TRIGGER last_timer_id
-AFTER INSERT ON timed_event
-FOR EACH ROW
-BEGIN
-    SET @timer_id=NEW.id;
 END//
 
 DELIMITER ;

@@ -153,7 +153,7 @@ function buildParamString(params) {
     if (keys.length !== 0) {
         for (let param of keys) {
             if (params[param] !== undefined) {
-                queryString += `${param}=${params[param]}&`;
+                queryString += `${param}=${encodeURI(params[param])}&`;
             }
         }
     }

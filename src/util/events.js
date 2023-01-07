@@ -13,6 +13,11 @@ class TimedEventGroup {
     */ 
    
     // Initializes the event group with an ID (MUST be unique among all existing group IDs) and a group function to run on each event
+
+    static cleanup_func = async (id) => {
+        await promiseQuery("DELETE FROM timed_event WHERE id=?", id);
+    };
+
     constructor(group_id, group_fun) {
         this.group_id = group_id;
         this.group_fun = group_fun;
@@ -21,10 +26,9 @@ class TimedEventGroup {
 
     // Executes backlog of expired events and sets the next earliest timeout
     async initialize() {
-        const expired_events = await promiseQuery("SELECT * FROM timed_event WHERE activation <= CURDATE() AND group_id=?", [this.group_id]);
+        const expired_events = await promiseQuery("SELECT * FROM timed_event WHERE activation <= NOW() AND group_id=?", [this.group_id]);
         for (let event of expired_events) {
-            this.group_fun(event);
-            await promiseQuery("DELETE FROM timed_events WHERE id=?", event.id);
+            await this.group_fun(event, async () => await TimedEventGroup.cleanup_func(event.id));
         }
 
         await this._setEarliestTimeout();
@@ -32,10 +36,9 @@ class TimedEventGroup {
 
     // Schedules a new event
     async addEvent(activation) {
-        console.log("Adding event");
         const queries = [
             "INSERT INTO timed_event(group_id, activation) VALUES(?, ?)",
-            "SELECT @timer_id AS id"
+            "SELECT LAST_INSERT_ID() AS id"
         ];
         const args_per_query = [
             [this.group_id, activation],
@@ -43,9 +46,7 @@ class TimedEventGroup {
         ];
         const id = (await atomicPromiseQueries(queries, args_per_query))[0].id;
 
-        if (this.current_event === null) {
-            await this._setEarliestTimeout();
-        }
+        await this._setEarliestTimeout();
 
         return id;
     }
@@ -53,8 +54,11 @@ class TimedEventGroup {
     // PRIVATE
     // Sets the next earliest timeout
     async _setEarliestTimeout() {
-        this.current_event = await promiseQuery("SELECT * FROM timed_event ORDER BY activation LIMIT 1");
-        console.log(this.current_event);
+        if (this.current_event !== null) {
+            return;
+        }
+
+        this.current_event = await promiseQuery("SELECT * FROM timed_event WHERE group_id=? ORDER BY activation LIMIT 1", [this.group_id]);
 
         if (this.current_event.length === 0) {
             this.current_event = null;
@@ -63,8 +67,8 @@ class TimedEventGroup {
 
         this.current_event = this.current_event[0];
 
-        //setTimeout(() => this._executeEvent(this), (new Date(this.current_event.activation)).getTime() - (new Date()).getTime());
-        setTimeout(() => this._executeEvent(this), 20000);
+        setTimeout(() => this._executeEvent(this), (new Date(this.current_event.activation)).getTime() - (new Date()).getTime());
+        //setTimeout(() => this._executeEvent(this), 10000);
     }
 
     // PRIVATE
@@ -72,15 +76,15 @@ class TimedEventGroup {
     // function will ensure that the next earliest activation will be selected,
     // even if timers are activated in the meantime.
     async _executeEvent(event_group) {
-        event_group.group_fun(event_group.current_event);
-        await promiseQuery("DELETE FROM timed_event WHERE id=?", event_group.current_event.id);
+        await event_group.group_fun(event_group.current_event, async () => await TimedEventGroup.cleanup_func(event_group.current_event.id));
+        this.current_event = null;
         this._setEarliestTimeout();
     }
 }
 
-async function discountEventHandler(event) {
-    const discount = await promiseQuery("SELECT * FROM discount INNER JOIN timed_event ON discount.timer_id=timed_event.id WHERE timed_event.id=?", event.id);
-    console.log(discount);
+async function discountEventHandler(event, cleanup) {
+    const discount = await promiseQuery("SELECT * FROM discount WHERE timer_id=?", event.id);
+    
 
     if (discount.length === 0) {
         return;
@@ -97,23 +101,47 @@ async function discountEventHandler(event) {
     
     let val = await atomicPromiseQueries(queries, args_per_query);
     val = val[0].condition_value;
-    console.log("Cond: ", val);
+
+    await cleanup();
 
     if (val === 0) {
-
         await promiseQuery("DELETE FROM discount WHERE shop_id=? AND product_name=?", [discount[0].shop_id, discount[0].product_name]);
     }
     else {
         const newDate = new Date(event.activation);
         newDate.setDate(newDate.getDate() + 7);
         const formattedDatetime = getDatetimeFromObject(newDate);
-        await promiseQuery("UPDATE discount SET expiry=? WHERE shop_id=? AND product_name=?", [formattedDatetime, discount.shop_id, discount.product_name]);
-        global.discountEventGroup.addEvent(formattedDatetime);
+        const bumpedId = await global.discountEventGroup.addEvent(formattedDatetime);
+        await promiseQuery("UPDATE discount SET expiry=?, timer_id=? WHERE shop_id=? AND product_name=?", [formattedDatetime, bumpedId, discount[0].shop_id, discount[0].product_name, bumpedId]);
     }
 }
 
-async function monthlyTokensEventHandler(event) {
+// This handler is fired at the end of each month, distributing tokens to all users appropriately
+async function monthlyTokensEventHandler(event, cleanup) {
+    // event.activation should be YYYY-MM-01
+    // calculate the number of tokens to distribute according to last month's number of users
+    const currentDate = new Date(event.activation);
+    const prevMonth = getDatetimeFromObject(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
 
+    // total tokens to distribute: 100U*(80%) = 80U
+    const total_users = (await promiseQuery("SELECT COUNT(*) AS total_users FROM user WHERE creation <= ?", prevMonth))[0].total_users;
+    const total_score = (await promiseQuery("SELECT SUM((CASE WHEN review_score < 0 THEN 0 ELSE review_score END)) AS total_score FROM user"))[0].total_score;
+
+    // distribute based on current month score and set current review score to 0
+    if (total_users > 0) {
+        if (total_score > 0) {
+            const tokens = 80*total_users;
+            await promiseQuery("UPDATE user SET tokens=ROUND((review_score/?)*?), total_tokens=total_tokens+tokens, review_score=0", [total_score, tokens]);
+        }
+        else {
+            await promiseQuery("UPDATE user SET tokens=0, review_score=0")
+        }
+    }
+
+    await cleanup();
+
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    await global.monthlyTokensEventGroup.addEvent(getDatetimeFromObject(currentDate));
 }
 
 export {TimedEventGroup, discountEventHandler, monthlyTokensEventHandler};

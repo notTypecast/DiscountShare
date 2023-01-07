@@ -46,7 +46,6 @@ async function addDiscount(shop_id, product_name, cost, username) {
     let formattedDatetime = getDatetimeFromObject(expiry);
 
     const id = await global.discountEventGroup.addEvent(formattedDatetime);
-    console.log("My new timer ID is: ", id);
 
     const queries = [
         "INSERT INTO discount(shop_id, product_name, cost, username, posted, expiry, timer_id) VALUES (?, ?, ?, ?, NOW(), ?, ?) ON DUPLICATE KEY UPDATE cost=VALUES(cost), username=VALUES(username), posted=VALUES(posted), expiry=VALUES(expiry), in_stock=1, timer_id=VALUES(timer_id)",

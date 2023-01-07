@@ -6,8 +6,7 @@ import { discountsControllerGet, discountsControllerPost, discountsControllerPat
 const router = express.Router();
 
 router.get("/discounts", requireAuth, generateMatchSchema("discounts", "get"), discountsControllerGet);
-// TODO add editDiscount middleware here, after generateMatchSchema call for post and patch
-router.post("/discounts", requireAuth, generateMatchSchema("discounts", "post"), discountsControllerPost);
-router.patch("/discounts", requireAuth, generateMatchSchema("discounts", "patch"), discountsControllerPatch);
+router.post("/discounts", requireAuth, generateMatchSchema("discounts", "post"), editDiscount, discountsControllerPost);
+router.patch("/discounts", requireAuth, generateMatchSchema("discounts", "patch"), editDiscount, discountsControllerPatch);
 
 export {router as discountsRouter};

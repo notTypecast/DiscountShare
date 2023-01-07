@@ -22,13 +22,14 @@ CREATE TABLE timed_event (
 CREATE TABLE user (
     username VARCHAR(24) PRIMARY KEY NOT NULL,
     email VARCHAR(255) NOT NULL,
-    hash CHAR(60) BINARY NOT NULL,
+    hash CHAR(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+    creation DATETIME DEFAULT NOW(),
     last_updated BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP()),
     tokens INT NOT NULL DEFAULT 0,
     total_tokens INT NOT NULL DEFAULT 0,
     review_score INT NOT NULL DEFAULT 0,
     total_review_score INT NOT NULL DEFAULT 0,
-    is_admin TINYINT(1) NOT NULL DEFAULT 0
+    is_admin TINYINT NOT NULL DEFAULT 0
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE shop (
@@ -78,7 +79,7 @@ CREATE TABLE discount (
     username VARCHAR(24) NOT NULL,
     posted DATETIME NOT NULL,
     expiry DATETIME NOT NULL,
-    in_stock TINYINT(1) NOT NULL DEFAULT 1,
+    in_stock TINYINT NOT NULL DEFAULT 1,
     timer_id INT,
     PRIMARY KEY (shop_id, product_name),
     FOREIGN KEY (shop_id) REFERENCES shop(id) ON UPDATE CASCADE ON DELETE CASCADE,

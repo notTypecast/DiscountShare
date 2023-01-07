@@ -37,7 +37,7 @@ const EXPECTED_DATA_POST = {
         "body": ["username", "password_b64"]
     },
     "discounts": {
-        "body": ["shop_id", "product_name", "cost"]
+        "body": ["shop_id", "product_name", "cost", "latitude", "longitude"]
     },
     "admin": {
         "files": [],

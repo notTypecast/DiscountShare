@@ -20,17 +20,15 @@ async function atomicPromiseQueries(queries, args_per_query) {
 
     let i;
     for (i = 0; i < queries.length - 1; ++i) {
-      await promiseQuery(queries[i], args_per_query[i]);
+      await queryConnectionPromise(conn, queries[i], args_per_query[i]);
     }
 
-    result = await promiseQuery(queries[i], args_per_query[i]);
+    result = await queryConnectionPromise(conn, queries[i], args_per_query[i]);
 
     await commitTransactionPromise(conn);
   }
   catch (err) {
-    console.log(err);
-    console.log("Rolling back transaction");
-    conn.rollback();
+    await rollbackTransactionPromise(conn);
     throw err;
   }
   finally {
@@ -71,6 +69,28 @@ async function commitTransactionPromise(conn) {
       }
       resolve();
     });
+  });
+}
+
+async function rollbackTransactionPromise(conn) {
+  return new Promise((resolve, reject) => {
+    conn.rollback((err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve();
+    });
+  });
+}
+
+async function queryConnectionPromise(conn, query, args) {
+  return new Promise((resolve, reject) => {
+    conn.query(query, args, (err, result) => {
+      if (err) {
+        reject(err);
+      }
+        resolve(result);
+      });
   });
 }
 

@@ -96,6 +96,27 @@ confirmPasswordInput.addEventListener("input", confirmPasswordEventListener);
 submitButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
+    if (usernameInput.value.length == 0) {
+        addWarning(usernameInput, "Username cannot be empty.");
+        return;
+    }
+
+    if (emailInput.value.length == 0) {
+        addWarning(emailInput, "E-mail cannot be empty.");
+        return;
+    }
+
+    if (passwordInput.value.length == 0) {
+        addWarning(passwordInput, "Password cannot be empty.");
+        return;
+    }
+
+    if (confirmPasswordInput.value !== passwordInput.value) {
+        addWarning(confirmPasswordInput, "Passwords do not match.");
+        return;
+    }
+
+
     showLoader();
     const response = await sameOriginPostRequest(registerEndpoint, {
         "username": usernameInput.value,

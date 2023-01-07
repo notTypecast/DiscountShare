@@ -81,7 +81,7 @@ async function getUserReviewHistory(username) {
 }
 
 async function getUserScoreData(username) {
-    let results = await promiseQuery("SELECT email, tokens, total_tokens, review_score, (CASE WHEN total_review_score >= 0 THEN total_review_score ELSE 0 END) as total_review_score FROM user WHERE username=?", username);
+    let results = await promiseQuery("SELECT email, tokens, total_tokens, (CASE WHEN review_score >= 0 THEN review_score ELSE 0 END) AS review_score, (CASE WHEN total_review_score >= 0 THEN total_review_score ELSE 0 END) AS total_review_score FROM user WHERE username=?", username);
 
     return results[0];
 }

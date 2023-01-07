@@ -304,6 +304,8 @@ nav {
     display: flex;
     flex-direction: row;
     align-items: center;
+    cursor: default;
+    user-select: none;
     margin: 0px 8px;
     color:rgb(110, 110, 110);
 }
