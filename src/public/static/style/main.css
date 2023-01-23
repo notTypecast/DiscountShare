@@ -229,6 +229,8 @@ nav {
 
 .discount-top-bar .material-icons {
     translate: 0px 3px;
+    cursor: default;
+    user-select: none;
 }
 
 .discount-stock-status {
@@ -570,7 +572,8 @@ nav {
     align-items: center;
     cursor: pointer;
     border-top-right-radius: 50px;
-    border-top-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    background-color:#fff;
 }
 
 .discount-add-search-results-wrap {

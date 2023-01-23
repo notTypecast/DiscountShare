@@ -91,6 +91,10 @@ function getCurrentPosition() {
         }, (error) => {
             gotPos = false;
             reject(error);
+        }, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 1800000 // 30 mins
         });
     });
 }

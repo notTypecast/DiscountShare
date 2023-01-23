@@ -16,7 +16,7 @@ cats = data["context"]["MAPP_PRODUCTS"]["result"]["categories"]
 
 out["categories"] = cats
 
-for i in range(len(prods)):
+for i in enumerate(prods):
     prod = {
         "id": i,
         "name": prods[i]["name"],

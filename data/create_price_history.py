@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from random import gauss
 
-with open("newres.json", "r") as f:
+with open("products.json", "r") as f:
     data = json.load(f)
 
 out = {
@@ -10,8 +10,14 @@ out = {
     "data": []
 }
 
+today = datetime.today()
+monday = today - timedelta(days=today.weekday())
+monday = monday.replace(hour=12, minute=0, second=0, microsecond=0)
+
+
+
 #c_date = datetime.fromtimestamp(data["fetch_date"])
-c_date = datetime.fromtimestamp(1673136000)
+c_date = datetime.fromtimestamp(monday.timestamp())
 
 
 dates_desc = []
@@ -35,5 +41,5 @@ for product in data["products"]:
             "price": p
         })
 
-with open("price_history_2023-01-02.json", "w") as f:
+with open(f"price_history_{monday.strftime('%Y-%m-%d')}.json", "w") as f:
     json.dump(out, f, ensure_ascii=False, indent=2)

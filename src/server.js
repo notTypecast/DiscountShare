@@ -18,7 +18,7 @@ global.pool = mysql.createPool({
     dateStrings: true
 });
 
-global.DEBUG_EDIT_DISCOUNTS = false;
+global.DEBUG_EDIT_DISCOUNTS = true;
 
 global.discountEventGroup = new TimedEventGroup(0, discountEventHandler);
 global.monthlyTokensEventGroup = new TimedEventGroup(1, monthlyTokensEventHandler);
@@ -57,7 +57,22 @@ app.get("/", requireAuth);
 app.get("/account", requireAuth);
 app.get("/login", loggedIn);
 app.get("/admin", requireAdmin);
-app.use(express.static("src/public", {index: "main.html", extensions: ["html"]}));
+
+app.use((req, res, next) => {
+    if(req.url.match(/.(jpg|jpeg|png|gif|ttf)$/i)) {
+        // override the default express static cache-control header
+        res.setHeader("Cache-Control", "public, max-age=31536000");
+    }
+    next();
+});
+
+app.use(express.static("src/public", {
+    index: "main.html",
+    extensions: ["html"],
+    maxAge: "1w"
+}));
+
+  
 
 
 app.listen(3000, () => console.log("Server has begun"));
