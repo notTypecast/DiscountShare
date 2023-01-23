@@ -407,7 +407,7 @@ function createDiscountCard(properties, allowOffers, shop_id, index) {
     cardBottomBar.classList.add("discount-bottom-bar");
     let cardPrice = document.createElement("p");
     cardPrice.classList.add("discount-price");
-    cardPrice.innerText = properties.cost + "€";
+    cardPrice.innerText = Number(properties.cost).toFixed(2) + "€";
     cardBottomBar.appendChild(cardPrice);
 
     let reviewWrap = document.createElement("div");

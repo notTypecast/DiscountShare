@@ -122,3 +122,21 @@ CREATE TABLE expired_review (
     FOREIGN KEY (username) REFERENCES user(username) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (expired_discount_id) REFERENCES expired_discount(discount_id) ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX discount_idx
+ON discount(posted, username);
+
+CREATE INDEX exp_discountIdx
+ON expired_discount(posted);
+
+CREATE INDEX price_idx
+ON price(day_date);
+
+CREATE INDEX product_idx
+ON product(category_id, subcategory_id);
+
+CREATE INDEX user_idx
+ON user(total_review_score);
+
+CREATE INDEX subcategory_idx
+ON subcategory(category_id);
