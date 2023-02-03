@@ -65,7 +65,13 @@ burgerMenu.addEventListener("click", (e) => {
 
 logoutBtn.addEventListener("click", logout);
 
-let mainMap = L.map('map', {attributionControl: false});
+let mainMap = L.map('map', {
+    attributionControl: false,
+    maxBounds: L.latLngBounds(
+        L.latLng(-90, -180),
+        L.latLng(90, 180)
+    )
+});
 let mainTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     noWrap: true,
     minZoom: 2

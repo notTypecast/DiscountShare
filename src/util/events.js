@@ -1,6 +1,8 @@
 import { promiseQuery, atomicPromiseQueries } from "./query.js";
 import { getDatetimeFromObject } from "./date.js";
 
+const MAX_SINT_32 = 2147483647;
+
 class TimedEventGroup {
     /* Defines a timed event group.
      * Timed event groups consist of groups of the same type of events that are scheduled 
@@ -67,8 +69,23 @@ class TimedEventGroup {
 
         this.current_event = this.current_event[0];
 
-        setTimeout(() => this._executeEvent(this), (new Date(this.current_event.activation)).getTime() - (new Date()).getTime());
-        //setTimeout(() => this._executeEvent(this), 10000);
+        //this._setTimeout_safe(5000);
+        this._setTimeout_safe((new Date(this.current_event.activation)).getTime() - (new Date()).getTime());
+    }
+
+    // PRIVATE
+    // Sets timeout, but correctly handles wait times larger than maximum value accepted by setTimeout (32-bit signed integer)
+    // Will chain multiple timeouts of max value to reach total timeout duration
+    _setTimeout_safe(sleep_duration) {
+        if (sleep_duration <= 0) {
+            this._executeEvent(this);
+        }
+        else if (sleep_duration <= MAX_SINT_32){
+            setTimeout(() => this._setTimeout_safe(0), sleep_duration);
+        }
+        else {
+            setTimeout(() => this._setTimeout_safe(sleep_duration - MAX_SINT_32), MAX_SINT_32);
+        }
     }
 
     // PRIVATE
